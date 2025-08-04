@@ -6,16 +6,20 @@ const Header = () => {
   const location = useLocation();
   
   return (
-    <header className="bg-hero-gradient p-6 shadow-soft relative">
+    <header className="bg-white p-6 shadow-soft relative">
       <div className="flex justify-between items-center">
         <div className="flex-1" />
         
         <Link to="/" className="flex-1 text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary-foreground text-shadow-soft">
-            Imagine Studios
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-black">
+            <span className="text-black">im</span>
+            <span className="text-yellow-500">A</span>
+            <span className="text-black">g</span>
+            <span className="text-yellow-500">I</span>
+            <span className="text-black">ne</span>
           </h1>
-          <p className="text-lg md:text-xl font-playful text-primary-foreground/90 mt-2">
-            imAgIne studios
+          <p className="text-lg md:text-xl font-playful text-black mt-1">
+            Studios
           </p>
         </Link>
         
