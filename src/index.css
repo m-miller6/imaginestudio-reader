@@ -212,3 +212,26 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
     transform: rotate(3deg);
   }
 }
+
+@keyframes shootingStar {
+  0% {
+    transform: translateX(-100px) translateY(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    transform: translateX(0) translateY(-5px) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(300px) translateY(-10px) scale(1);
+    opacity: 1;
+  }
+  90% {
+    transform: translateX(600px) translateY(-5px) scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(800px) translateY(0) scale(0);
+    opacity: 0;
+  }
+}
