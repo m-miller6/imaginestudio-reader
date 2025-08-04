@@ -1,4 +1,4 @@
-import { Library, PlusCircle, User } from "lucide-react";
+import { Library, PlusCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 
@@ -27,17 +27,6 @@ const Navigation = () => {
           >
             <PlusCircle className="h-5 w-5" />
             Add Stories
-          </Button>
-        </Link>
-        
-        <Link to="/profile">
-          <Button 
-            variant={location.pathname === "/profile" ? "default" : "ghost"} 
-            size="sm" 
-            className="flex items-center gap-2"
-          >
-            <User className="h-4 w-4" />
-            <span className="hidden md:inline">Profile</span>
           </Button>
         </Link>
       </div>
