@@ -142,7 +142,13 @@ const Homepage = () => {
                 <Carousel className="w-full">
                   <CarouselContent className="-ml-2 md:-ml-4">
                     {storyCategories
-                      .filter(story => story.category === category.toLowerCase().replace(' ', '').replace(' ', ''))
+                      .filter(story => {
+                        const categoryKey = category.toLowerCase().replace(/\s+/g, '');
+                        if (categoryKey === 'suggested') return story.category === 'suggested';
+                        if (categoryKey === 'continuereading') return story.category === 'continue';
+                        if (categoryKey === 'newthisweek') return story.category === 'new';
+                        return false;
+                      })
                       .map((story, index) => (
                         <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                           <Link to="/create-character" className="block">
