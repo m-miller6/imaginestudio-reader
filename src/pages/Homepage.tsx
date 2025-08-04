@@ -48,6 +48,17 @@ const Homepage = () => {
     { title: "Pirate Treasure", category: "suggested", progress: 0, image: neverlandCover, description: "Hunt for buried gold" },
     { title: "Fairy Kingdom", category: "continue", progress: 20, image: christmasCover, description: "Magical realm awaits" },
     { title: "Robot Friends", category: "new", progress: 0, image: neverlandCover, description: "Future technology adventures" },
+    { title: "Dragon Valley", category: "continue", progress: 75, image: christmasCover, description: "Befriend mighty dragons" },
+    { title: "Underwater City", category: "continue", progress: 45, image: neverlandCover, description: "Explore Atlantis mysteries" },
+    { title: "Time Traveler", category: "continue", progress: 15, image: christmasCover, description: "Journey through time" },
+    { title: "Jungle Explorer", category: "continue", progress: 80, image: neverlandCover, description: "Discover hidden temples" },
+    { title: "Ice Kingdom", category: "continue", progress: 30, image: christmasCover, description: "Frozen wonderland adventure" },
+    { title: "Superhero Academy", category: "new", progress: 0, image: neverlandCover, description: "Train your superpowers" },
+    { title: "Alien Encounter", category: "new", progress: 0, image: christmasCover, description: "Meet friendly aliens" },
+    { title: "Wizard School", category: "new", progress: 0, image: neverlandCover, description: "Learn magical spells" },
+    { title: "Animal Rescue", category: "new", progress: 0, image: christmasCover, description: "Save endangered animals" },
+    { title: "Mystery Mansion", category: "new", progress: 0, image: neverlandCover, description: "Solve spooky puzzles" },
+    { title: "Sports Champion", category: "new", progress: 0, image: christmasCover, description: "Become a sports star" },
   ];
 
   return (
