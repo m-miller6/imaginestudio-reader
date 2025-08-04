@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import neverlandCover from "@/assets/trip-to-neverland-cover.jpg";
@@ -19,6 +20,21 @@ const Homepage = () => {
       title: "Odyssey First Christmas",
       image: christmasCover,
       description: "A heartwarming holiday tale"
+    },
+    {
+      title: "Space Explorer",
+      image: neverlandCover,
+      description: "Journey to distant galaxies"
+    },
+    {
+      title: "Princess Castle",
+      image: christmasCover,
+      description: "Royal adventures await"
+    },
+    {
+      title: "Ocean Adventure",
+      image: neverlandCover,
+      description: "Dive into underwater mysteries"
     }
   ];
 
@@ -42,28 +58,34 @@ const Homepage = () => {
             Featured Adventures
           </h2>
           
-          <div className="grid md:grid-cols-2 gap-6">
-            {featuredBooks.map((book, index) => (
-              <Link key={index} to="/create-character" className="block">
-                <Card className="card-magical bg-card/95 backdrop-blur-sm border-2 border-white/20 overflow-hidden">
-                  <div className="aspect-video relative">
-                    <img 
-                      src={book.image} 
-                      alt={book.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <h3 className="text-xl font-headline font-bold text-shadow-soft">
-                        {book.title}
-                      </h3>
-                      <p className="font-playful text-sm">{book.description}</p>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <Carousel className="w-full max-w-5xl mx-auto">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {featuredBooks.map((book, index) => (
+                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <Link to="/create-character" className="block">
+                    <Card className="card-magical bg-card/95 backdrop-blur-sm border-2 border-white/20 overflow-hidden">
+                      <div className="aspect-video relative">
+                        <img 
+                          src={book.image} 
+                          alt={book.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        <div className="absolute bottom-4 left-4 text-white">
+                          <h3 className="text-xl font-headline font-bold text-shadow-soft">
+                            {book.title}
+                          </h3>
+                          <p className="font-playful text-sm">{book.description}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
         </div>
       </section>
 
