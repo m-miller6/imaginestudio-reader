@@ -444,6 +444,9 @@ const Homepage = () => {
         </div>
       </section>
 
+      {/* Spacer above navigation */}
+      <div className="h-8"></div>
+
       <Navigation />
     </div>
   );
