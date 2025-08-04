@@ -333,7 +333,7 @@ const Homepage = () => {
               {getEducationalStoriesBySubject().map((subjectGroup) => (
                 <div key={subjectGroup.subject}>
                   <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
-                    {subjectGroup.subject} Educational Stories
+                    {subjectGroup.subject}
                   </h3>
                   
                   <Carousel className="w-full">
