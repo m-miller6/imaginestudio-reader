@@ -122,7 +122,10 @@ const Explore = () => {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredFeaturedStories.map((story, index) => (
-              <Link key={index} to="/create-character">
+              <Link 
+                key={index} 
+                to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+              >
                 <Card className="card-magical bg-card border-2 border-border overflow-hidden hover:scale-105 transition-transform">
                   <div className="aspect-video relative">
                     <img 
@@ -176,7 +179,9 @@ const Explore = () => {
             <CarouselContent className="-ml-2 md:-ml-4">
               {filteredNewReleases.map((story, index) => (
                 <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/4">
-                  <Link to="/create-character">
+                  <Link 
+                    to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
                     <Card className="card-magical bg-card border-2 border-border overflow-hidden hover:scale-105 transition-transform">
                       <div className="aspect-video relative">
                         <img 

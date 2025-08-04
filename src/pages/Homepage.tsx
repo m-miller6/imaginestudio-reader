@@ -166,7 +166,15 @@ const Homepage = () => {
             <CarouselContent className="-ml-2 md:-ml-4">
               {featuredBooks.map((book, index) => (
                 <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                  <Link to="/create-character" className="block">
+                  <Link 
+                    to={book.title === "Trip to NeverLand" 
+                      ? "/story/neverland" 
+                      : book.title === "Odyssey First Christmas" 
+                      ? "/story/christmas" 
+                      : "/create-character"
+                    } 
+                    className="block"
+                  >
                     <Card className="card-magical bg-card/95 backdrop-blur-sm border-2 border-white/20 overflow-hidden">
                       <div className="aspect-video relative">
                         <img 
@@ -258,8 +266,12 @@ const Homepage = () => {
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {getTopTenStories().map((story, index) => (
-                  <Link key={index} to="/create-character" className="block">
+                 {getTopTenStories().map((story, index) => (
+                   <Link 
+                     key={index} 
+                     to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+                     className="block"
+                   >
                     <Card className="card-magical bg-card border-2 border-border overflow-hidden">
                       <div className="aspect-video relative">
                         <img 
@@ -312,7 +324,10 @@ const Homepage = () => {
                     <CarouselContent className="-ml-2 md:-ml-4">
                       {genreGroup.stories.map((story, index) => (
                         <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                          <Link to="/create-character" className="block">
+                           <Link 
+                             to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+                             className="block"
+                           >
                             <Card className="card-magical bg-card border-2 border-border overflow-hidden">
                               <div className="aspect-video relative">
                                 <img 
@@ -368,7 +383,10 @@ const Homepage = () => {
                     <CarouselContent className="-ml-2 md:-ml-4">
                       {subjectGroup.stories.map((story, index) => (
                         <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                          <Link to="/create-character" className="block">
+                           <Link 
+                             to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+                             className="block"
+                           >
                             <Card className="card-magical bg-card border-2 border-border overflow-hidden">
                               <div className="aspect-video relative">
                                 <img 
@@ -424,7 +442,10 @@ const Homepage = () => {
                     <CarouselContent className="-ml-2 md:-ml-4">
                       {getFilteredStories(category).map((story, index) => (
                           <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                            <Link to="/create-character" className="block">
+                             <Link 
+                               to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+                               className="block"
+                             >
                               <Card className="card-magical bg-card border-2 border-border overflow-hidden">
                                 <div className="aspect-video relative">
                                   <img 
