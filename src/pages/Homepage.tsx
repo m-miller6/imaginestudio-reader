@@ -33,6 +33,7 @@ import sportsChampionCover from "@/assets/sports-champion-cover.jpg";
 
 const Homepage = () => {
   const [showTopTen, setShowTopTen] = useState(false);
+  const [showInteractive, setShowInteractive] = useState(false);
 
   const featuredBooks = [
     {
@@ -63,26 +64,26 @@ const Homepage = () => {
   ];
 
   const storyCategories = [
-    { title: "Ocean Adventure", category: "suggested", progress: 0, image: oceanAdventureCover, description: "Dive deep into the blue seas", ranking: 3 },
-    { title: "Space Explorer", category: "continue", progress: 35, image: spaceExplorerCover, description: "Journey through the cosmos", ranking: 1 },
-    { title: "Forest Friends", category: "new", progress: 0, image: forestFriendsCover, description: "Meet woodland creatures", ranking: 7 },
-    { title: "Princess Castle", category: "suggested", progress: 0, image: princessCastleCover, description: "Royal adventures await", ranking: 4 },
-    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: dinosaurDiscoveryCover, description: "Prehistoric adventures", ranking: 2 },
-    { title: "Magic Garden", category: "new", progress: 0, image: magicGardenCover, description: "Enchanted plant kingdom", ranking: 8 },
-    { title: "Pirate Treasure", category: "suggested", progress: 0, image: pirateTreasureCover, description: "Hunt for buried gold", ranking: 5 },
-    { title: "Fairy Kingdom", category: "continue", progress: 20, image: fairyKingdomCover, description: "Magical realm awaits", ranking: 9 },
-    { title: "Robot Friends", category: "new", progress: 0, image: robotFriendsCover, description: "Future technology adventures", ranking: 6 },
-    { title: "Dragon Valley", category: "continue", progress: 75, image: dragonValleyCover, description: "Befriend mighty dragons", ranking: 10 },
-    { title: "Underwater City", category: "continue", progress: 45, image: underwaterCityCover, description: "Explore Atlantis mysteries" },
-    { title: "Time Traveler", category: "continue", progress: 15, image: timeTravelerCover, description: "Journey through time" },
-    { title: "Jungle Explorer", category: "continue", progress: 80, image: jungleExplorerCover, description: "Discover hidden temples" },
-    { title: "Ice Kingdom", category: "continue", progress: 30, image: iceKingdomCover, description: "Frozen wonderland adventure" },
-    { title: "Superhero Academy", category: "new", progress: 0, image: superheroAcademyCover, description: "Train your superpowers" },
-    { title: "Alien Encounter", category: "new", progress: 0, image: alienEncounterCover, description: "Meet friendly aliens" },
-    { title: "Wizard School", category: "new", progress: 0, image: wizardSchoolCover, description: "Learn magical spells" },
-    { title: "Animal Rescue", category: "new", progress: 0, image: animalRescueCover, description: "Save endangered animals" },
-    { title: "Mystery Mansion", category: "new", progress: 0, image: mysteryMansionCover, description: "Solve spooky puzzles" },
-    { title: "Sports Champion", category: "new", progress: 0, image: sportsChampionCover, description: "Become a sports star" },
+    { title: "Ocean Adventure", category: "suggested", progress: 0, image: oceanAdventureCover, description: "Dive deep into the blue seas", ranking: 3, interactive: true, genre: "Adventure" },
+    { title: "Space Explorer", category: "continue", progress: 35, image: spaceExplorerCover, description: "Journey through the cosmos", ranking: 1, interactive: true, genre: "Sci-Fi" },
+    { title: "Forest Friends", category: "new", progress: 0, image: forestFriendsCover, description: "Meet woodland creatures", ranking: 7, interactive: false, genre: "Nature" },
+    { title: "Princess Castle", category: "suggested", progress: 0, image: princessCastleCover, description: "Royal adventures await", ranking: 4, interactive: true, genre: "Fantasy" },
+    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: dinosaurDiscoveryCover, description: "Prehistoric adventures", ranking: 2, interactive: true, genre: "Adventure" },
+    { title: "Magic Garden", category: "new", progress: 0, image: magicGardenCover, description: "Enchanted plant kingdom", ranking: 8, interactive: true, genre: "Fantasy" },
+    { title: "Pirate Treasure", category: "suggested", progress: 0, image: pirateTreasureCover, description: "Hunt for buried gold", ranking: 5, interactive: true, genre: "Adventure" },
+    { title: "Fairy Kingdom", category: "continue", progress: 20, image: fairyKingdomCover, description: "Magical realm awaits", ranking: 9, interactive: true, genre: "Fantasy" },
+    { title: "Robot Friends", category: "new", progress: 0, image: robotFriendsCover, description: "Future technology adventures", ranking: 6, interactive: true, genre: "Sci-Fi" },
+    { title: "Dragon Valley", category: "continue", progress: 75, image: dragonValleyCover, description: "Befriend mighty dragons", ranking: 10, interactive: false, genre: "Fantasy" },
+    { title: "Underwater City", category: "continue", progress: 45, image: underwaterCityCover, description: "Explore Atlantis mysteries", interactive: true, genre: "Adventure" },
+    { title: "Time Traveler", category: "continue", progress: 15, image: timeTravelerCover, description: "Journey through time", interactive: true, genre: "Sci-Fi" },
+    { title: "Jungle Explorer", category: "continue", progress: 80, image: jungleExplorerCover, description: "Discover hidden temples", interactive: false, genre: "Adventure" },
+    { title: "Ice Kingdom", category: "continue", progress: 30, image: iceKingdomCover, description: "Frozen wonderland adventure", interactive: true, genre: "Fantasy" },
+    { title: "Superhero Academy", category: "new", progress: 0, image: superheroAcademyCover, description: "Train your superpowers", interactive: true, genre: "Action" },
+    { title: "Alien Encounter", category: "new", progress: 0, image: alienEncounterCover, description: "Meet friendly aliens", interactive: false, genre: "Sci-Fi" },
+    { title: "Wizard School", category: "new", progress: 0, image: wizardSchoolCover, description: "Learn magical spells", interactive: true, genre: "Fantasy" },
+    { title: "Animal Rescue", category: "new", progress: 0, image: animalRescueCover, description: "Save endangered animals", interactive: false, genre: "Nature" },
+    { title: "Mystery Mansion", category: "new", progress: 0, image: mysteryMansionCover, description: "Solve spooky puzzles", interactive: true, genre: "Mystery" },
+    { title: "Sports Champion", category: "new", progress: 0, image: sportsChampionCover, description: "Become a sports star", interactive: false, genre: "Sports" },
   ];
 
   const getFilteredStories = (category: string) => {
@@ -101,6 +102,16 @@ const Homepage = () => {
     return storyCategories
       .filter(story => story.ranking && story.ranking <= 10)
       .sort((a, b) => (a.ranking || 999) - (b.ranking || 999));
+  };
+
+  const getInteractiveStoriesByGenre = () => {
+    const interactiveStories = storyCategories.filter(story => story.interactive);
+    const genres = [...new Set(interactiveStories.map(story => story.genre))];
+    
+    return genres.map(genre => ({
+      genre,
+      stories: interactiveStories.filter(story => story.genre === genre)
+    }));
   };
 
   return (
@@ -154,12 +165,23 @@ const Homepage = () => {
                 variant={showTopTen ? "default" : "outline"} 
                 size="sm" 
                 className="font-playful"
-                onClick={() => setShowTopTen(!showTopTen)}
+                onClick={() => {
+                  setShowTopTen(!showTopTen);
+                  setShowInteractive(false);
+                }}
               >
                 <Star className="h-4 w-4 mr-1" />
                 Top 10
               </Button>
-              <Button variant="outline" size="sm" className="font-playful">
+              <Button 
+                variant={showInteractive ? "default" : "outline"} 
+                size="sm" 
+                className="font-playful"
+                onClick={() => {
+                  setShowInteractive(!showInteractive);
+                  setShowTopTen(false);
+                }}
+              >
                 <Sparkles className="h-4 w-4 mr-1" />
                 Interactive
               </Button>
@@ -178,7 +200,7 @@ const Homepage = () => {
             </div>
           </div>
 
-          {/* Story Categories or Top 10 */}
+          {/* Story Categories, Top 10, or Interactive */}
           {showTopTen ? (
             <div>
               <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
@@ -227,6 +249,62 @@ const Homepage = () => {
                   </Link>
                 ))}
               </div>
+            </div>
+          ) : showInteractive ? (
+            <div className="space-y-8">
+              {getInteractiveStoriesByGenre().map((genreGroup) => (
+                <div key={genreGroup.genre}>
+                  <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
+                    {genreGroup.genre} Interactive Stories
+                  </h3>
+                  
+                  <Carousel className="w-full">
+                    <CarouselContent className="-ml-2 md:-ml-4">
+                      {genreGroup.stories.map((story, index) => (
+                        <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                          <Link to="/create-character" className="block">
+                            <Card className="card-magical bg-card border-2 border-border overflow-hidden">
+                              <div className="aspect-video relative">
+                                <img 
+                                  src={story.image} 
+                                  alt={story.title}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                <div className="absolute bottom-4 left-4 text-white">
+                                  <h4 className="text-lg font-headline font-bold text-shadow-soft">
+                                    {story.title}
+                                  </h4>
+                                  <p className="font-playful text-sm">{story.description}</p>
+                                </div>
+                              </div>
+                              
+                              {story.progress > 0 && (
+                                <CardFooter className="p-4">
+                                  <div className="w-full">
+                                    <div className="flex justify-between text-sm mb-1">
+                                      <span className="font-playful">Progress</span>
+                                      <span className="font-bold">{story.progress}%</span>
+                                    </div>
+                                    <div className="w-full bg-muted rounded-full h-2">
+                                      <div 
+                                        className="bg-primary h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${story.progress}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                </CardFooter>
+                              )}
+                            </Card>
+                          </Link>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="hidden md:flex" />
+                    <CarouselNext className="hidden md:flex" />
+                  </Carousel>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="space-y-8">
