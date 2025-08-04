@@ -1,8 +1,10 @@
 import { Search, Filter, Star, BookOpen, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
@@ -30,6 +32,8 @@ import mysteryMansionCover from "@/assets/mystery-mansion-cover.jpg";
 import sportsChampionCover from "@/assets/sports-champion-cover.jpg";
 
 const Homepage = () => {
+  const [showTopTen, setShowTopTen] = useState(false);
+
   const featuredBooks = [
     {
       title: "Trip to NeverLand",
@@ -59,16 +63,16 @@ const Homepage = () => {
   ];
 
   const storyCategories = [
-    { title: "Ocean Adventure", category: "suggested", progress: 0, image: oceanAdventureCover, description: "Dive deep into the blue seas" },
-    { title: "Space Explorer", category: "continue", progress: 35, image: spaceExplorerCover, description: "Journey through the cosmos" },
-    { title: "Forest Friends", category: "new", progress: 0, image: forestFriendsCover, description: "Meet woodland creatures" },
-    { title: "Princess Castle", category: "suggested", progress: 0, image: princessCastleCover, description: "Royal adventures await" },
-    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: dinosaurDiscoveryCover, description: "Prehistoric adventures" },
-    { title: "Magic Garden", category: "new", progress: 0, image: magicGardenCover, description: "Enchanted plant kingdom" },
-    { title: "Pirate Treasure", category: "suggested", progress: 0, image: pirateTreasureCover, description: "Hunt for buried gold" },
-    { title: "Fairy Kingdom", category: "continue", progress: 20, image: fairyKingdomCover, description: "Magical realm awaits" },
-    { title: "Robot Friends", category: "new", progress: 0, image: robotFriendsCover, description: "Future technology adventures" },
-    { title: "Dragon Valley", category: "continue", progress: 75, image: dragonValleyCover, description: "Befriend mighty dragons" },
+    { title: "Ocean Adventure", category: "suggested", progress: 0, image: oceanAdventureCover, description: "Dive deep into the blue seas", ranking: 3 },
+    { title: "Space Explorer", category: "continue", progress: 35, image: spaceExplorerCover, description: "Journey through the cosmos", ranking: 1 },
+    { title: "Forest Friends", category: "new", progress: 0, image: forestFriendsCover, description: "Meet woodland creatures", ranking: 7 },
+    { title: "Princess Castle", category: "suggested", progress: 0, image: princessCastleCover, description: "Royal adventures await", ranking: 4 },
+    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: dinosaurDiscoveryCover, description: "Prehistoric adventures", ranking: 2 },
+    { title: "Magic Garden", category: "new", progress: 0, image: magicGardenCover, description: "Enchanted plant kingdom", ranking: 8 },
+    { title: "Pirate Treasure", category: "suggested", progress: 0, image: pirateTreasureCover, description: "Hunt for buried gold", ranking: 5 },
+    { title: "Fairy Kingdom", category: "continue", progress: 20, image: fairyKingdomCover, description: "Magical realm awaits", ranking: 9 },
+    { title: "Robot Friends", category: "new", progress: 0, image: robotFriendsCover, description: "Future technology adventures", ranking: 6 },
+    { title: "Dragon Valley", category: "continue", progress: 75, image: dragonValleyCover, description: "Befriend mighty dragons", ranking: 10 },
     { title: "Underwater City", category: "continue", progress: 45, image: underwaterCityCover, description: "Explore Atlantis mysteries" },
     { title: "Time Traveler", category: "continue", progress: 15, image: timeTravelerCover, description: "Journey through time" },
     { title: "Jungle Explorer", category: "continue", progress: 80, image: jungleExplorerCover, description: "Discover hidden temples" },
@@ -80,6 +84,23 @@ const Homepage = () => {
     { title: "Mystery Mansion", category: "new", progress: 0, image: mysteryMansionCover, description: "Solve spooky puzzles" },
     { title: "Sports Champion", category: "new", progress: 0, image: sportsChampionCover, description: "Become a sports star" },
   ];
+
+  const getFilteredStories = (category: string) => {
+    let filtered = storyCategories.filter(story => {
+      const categoryKey = category.toLowerCase().replace(/\s+/g, '');
+      if (categoryKey === 'suggested') return story.category === 'suggested';
+      if (categoryKey === 'continuereading') return story.category === 'continue';
+      if (categoryKey === 'newthisweek') return story.category === 'new';
+      return false;
+    });
+
+    if (showTopTen) {
+      filtered = filtered.filter(story => story.ranking && story.ranking <= 10);
+      filtered.sort((a, b) => (a.ranking || 999) - (b.ranking || 999));
+    }
+
+    return filtered;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -128,7 +149,12 @@ const Homepage = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className="font-playful">
+              <Button 
+                variant={showTopTen ? "default" : "outline"} 
+                size="sm" 
+                className="font-playful"
+                onClick={() => setShowTopTen(!showTopTen)}
+              >
                 <Star className="h-4 w-4 mr-1" />
                 Top 10
               </Button>
@@ -161,15 +187,7 @@ const Homepage = () => {
                 
                 <Carousel className="w-full">
                   <CarouselContent className="-ml-2 md:-ml-4">
-                    {storyCategories
-                      .filter(story => {
-                        const categoryKey = category.toLowerCase().replace(/\s+/g, '');
-                        if (categoryKey === 'suggested') return story.category === 'suggested';
-                        if (categoryKey === 'continuereading') return story.category === 'continue';
-                        if (categoryKey === 'newthisweek') return story.category === 'new';
-                        return false;
-                      })
-                      .map((story, index) => (
+                    {getFilteredStories(category).map((story, index) => (
                         <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
                           <Link to="/create-character" className="block">
                             <Card className="card-magical bg-card border-2 border-border overflow-hidden">
@@ -180,6 +198,11 @@ const Homepage = () => {
                                   className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                {story.ranking && (
+                                  <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-bold text-sm px-2 py-1">
+                                    #{story.ranking}
+                                  </Badge>
+                                )}
                                 <div className="absolute bottom-4 left-4 text-white">
                                   <h4 className="text-lg font-headline font-bold text-shadow-soft">
                                     {story.title}
