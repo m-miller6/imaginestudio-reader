@@ -9,6 +9,7 @@ import CharacterCreation from "./pages/CharacterCreation";
 import StoryReader from "./pages/StoryReader";
 import Library from "./pages/Library";
 import Profile from "./pages/Profile";
+import StoryDetail from "./pages/StoryDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/create-character" element={<CharacterCreation />} />
           <Route path="/story-reader" element={<StoryReader />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/story/:storyId" element={<StoryDetail />} />
           <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
