@@ -39,12 +39,15 @@ const Homepage = () => {
   ];
 
   const storyCategories = [
-    { title: "Ocean Adventure", category: "suggested", progress: 0 },
-    { title: "Space Explorer", category: "continue", progress: 35 },
-    { title: "Forest Friends", category: "new", progress: 0 },
-    { title: "Princess Castle", category: "suggested", progress: 0 },
-    { title: "Dinosaur Discovery", category: "continue", progress: 60 },
-    { title: "Magic Garden", category: "new", progress: 0 },
+    { title: "Ocean Adventure", category: "suggested", progress: 0, image: neverlandCover, description: "Dive deep into the blue seas" },
+    { title: "Space Explorer", category: "continue", progress: 35, image: christmasCover, description: "Journey through the cosmos" },
+    { title: "Forest Friends", category: "new", progress: 0, image: neverlandCover, description: "Meet woodland creatures" },
+    { title: "Princess Castle", category: "suggested", progress: 0, image: christmasCover, description: "Royal adventures await" },
+    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: neverlandCover, description: "Prehistoric adventures" },
+    { title: "Magic Garden", category: "new", progress: 0, image: christmasCover, description: "Enchanted plant kingdom" },
+    { title: "Pirate Treasure", category: "suggested", progress: 0, image: neverlandCover, description: "Hunt for buried gold" },
+    { title: "Fairy Kingdom", category: "continue", progress: 20, image: christmasCover, description: "Magical realm awaits" },
+    { title: "Robot Friends", category: "new", progress: 0, image: neverlandCover, description: "Future technology adventures" },
   ];
 
   return (
@@ -125,41 +128,53 @@ const Homepage = () => {
                   {category}
                 </h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {storyCategories
-                    .filter(story => story.category === category.toLowerCase().replace(' ', '').replace(' ', ''))
-                    .map((story, index) => (
-                      <Link key={index} to="/create-character">
-                        <Card className="card-magical bg-card border-2 border-border overflow-hidden">
-                          <CardContent className="p-0">
-                            <div className="aspect-video bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                              <div className="text-center p-4">
-                                <BookOpen className="h-12 w-12 mx-auto mb-2 text-primary" />
-                                <h4 className="font-headline font-bold text-lg">{story.title}</h4>
-                              </div>
-                            </div>
-                          </CardContent>
-                          
-                          {story.progress > 0 && (
-                            <CardFooter className="p-4">
-                              <div className="w-full">
-                                <div className="flex justify-between text-sm mb-1">
-                                  <span className="font-playful">Progress</span>
-                                  <span className="font-bold">{story.progress}%</span>
-                                </div>
-                                <div className="w-full bg-muted rounded-full h-2">
-                                  <div 
-                                    className="bg-primary h-2 rounded-full transition-all duration-300"
-                                    style={{ width: `${story.progress}%` }}
-                                  />
+                <Carousel className="w-full">
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {storyCategories
+                      .filter(story => story.category === category.toLowerCase().replace(' ', '').replace(' ', ''))
+                      .map((story, index) => (
+                        <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                          <Link to="/create-character" className="block">
+                            <Card className="card-magical bg-card border-2 border-border overflow-hidden">
+                              <div className="aspect-video relative">
+                                <img 
+                                  src={story.image} 
+                                  alt={story.title}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                <div className="absolute bottom-4 left-4 text-white">
+                                  <h4 className="text-lg font-headline font-bold text-shadow-soft">
+                                    {story.title}
+                                  </h4>
+                                  <p className="font-playful text-sm">{story.description}</p>
                                 </div>
                               </div>
-                            </CardFooter>
-                          )}
-                        </Card>
-                      </Link>
-                    ))}
-                </div>
+                              
+                              {story.progress > 0 && (
+                                <CardFooter className="p-4">
+                                  <div className="w-full">
+                                    <div className="flex justify-between text-sm mb-1">
+                                      <span className="font-playful">Progress</span>
+                                      <span className="font-bold">{story.progress}%</span>
+                                    </div>
+                                    <div className="w-full bg-muted rounded-full h-2">
+                                      <div 
+                                        className="bg-primary h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${story.progress}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                </CardFooter>
+                              )}
+                            </Card>
+                          </Link>
+                        </CarouselItem>
+                      ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden md:flex" />
+                  <CarouselNext className="hidden md:flex" />
+                </Carousel>
               </div>
             ))}
           </div>
