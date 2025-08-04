@@ -39,7 +39,7 @@ const Homepage = () => {
       <section className="p-6 bg-hero-gradient">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-headline font-bold text-center text-primary-foreground mb-8">
-            Featured Adventures
+            Explore New Adventures
           </h2>
           
           <div className="grid md:grid-cols-2 gap-6">
