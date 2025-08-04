@@ -277,7 +277,7 @@ const Homepage = () => {
               {getInteractiveStoriesByGenre().map((genreGroup) => (
                 <div key={genreGroup.genre}>
                   <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
-                    {genreGroup.genre} Interactive Stories
+                    {genreGroup.genre}
                   </h3>
                   
                   <Carousel className="w-full">
