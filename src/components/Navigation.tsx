@@ -1,4 +1,4 @@
-import { Library, PlusCircle, Home } from "lucide-react";
+import { Library, PlusCircle, Home, Compass } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
 
@@ -16,6 +16,17 @@ const Navigation = () => {
           >
             <Home className="h-5 w-5" />
             <span className="hidden md:inline">Home</span>
+          </Button>
+        </Link>
+        
+        <Link to="/explore">
+          <Button 
+            variant={location.pathname === "/explore" ? "default" : "ghost"} 
+            size="lg" 
+            className="flex items-center gap-2 h-12 px-6"
+          >
+            <Compass className="h-5 w-5" />
+            <span className="hidden md:inline">Explore</span>
           </Button>
         </Link>
         
