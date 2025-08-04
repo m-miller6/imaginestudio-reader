@@ -44,134 +44,176 @@ const Library = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="flex-1 p-6 pb-20 md:pb-6">
-        <div className="max-w-4xl mx-auto">
-          {/* Library Title - matches reference image */}
-          <h1 className="text-5xl font-headline font-bold text-center mb-12">Library</h1>
-          
-          {/* Story Grid - exactly matching reference layout */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-            {/* Top Row - Main Stories */}
-            <div className="flex flex-col items-center group cursor-pointer" onClick={() => window.location.href = '/story-reader'}>
-              <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-blue-400 to-cyan-400 p-6 mb-4 relative overflow-hidden hover-scale">
-                {/* Castle silhouette */}
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-                  <div className="relative">
-                    {/* Main tower */}
-                    <div className="w-12 h-16 bg-yellow-400 rounded-t-lg border-2 border-yellow-600 relative">
-                      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-2 h-6 bg-yellow-600"></div>
-                      <div className="absolute top-3 left-1 right-1 h-1 bg-yellow-600"></div>
-                      <div className="absolute top-6 left-1 right-1 h-1 bg-yellow-600"></div>
-                    </div>
-                    {/* Side towers */}
-                    <div className="absolute -left-3 bottom-0 w-8 h-12 bg-yellow-400 rounded-t-lg border-2 border-yellow-600"></div>
-                    <div className="absolute -right-3 bottom-0 w-8 h-12 bg-yellow-400 rounded-t-lg border-2 border-yellow-600"></div>
-                  </div>
-                </div>
-                {/* Fairy silhouette */}
-                <div className="absolute top-4 right-6">
-                  <div className="w-6 h-8 bg-black rounded-full relative">
-                    {/* Wings */}
-                    <div className="absolute -right-1 top-1 w-4 h-3 bg-black rounded-full opacity-70"></div>
-                    <div className="absolute -right-2 top-2 w-3 h-2 bg-black rounded-full opacity-50"></div>
+      <main className="flex-1 p-6">
+        <div className="max-w-6xl mx-auto">
+          <Tabs defaultValue="library" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-8 bg-muted rounded-xl p-1">
+              <TabsTrigger 
+                value="neverland" 
+                className="font-playful rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Trip to NeverLand
+              </TabsTrigger>
+              <TabsTrigger 
+                value="christmas" 
+                className="font-playful rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Odyssey First Christmas
+              </TabsTrigger>
+              <TabsTrigger 
+                value="library" 
+                className="font-playful rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                Library
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="library" className="space-y-6">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-headline font-bold text-primary mb-2">
+                  Your Story Library
+                </h2>
+                <p className="font-playful text-lg text-muted-foreground">
+                  All your magical adventures in one place
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {savedStories.map((story, index) => (
+                  <Card key={index} className="card-magical shadow-soft border-2 border-border overflow-hidden">
+                    <CardHeader className="p-0">
+                      <div className="aspect-video relative">
+                        <img 
+                          src={story.image} 
+                          alt={story.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        <div className="absolute bottom-2 left-2 text-white">
+                          <CardTitle className="text-lg font-headline font-bold text-shadow-soft">
+                            {story.title}
+                          </CardTitle>
+                        </div>
+                        
+                        {story.progress === 100 && (
+                          <div className="absolute top-2 right-2 bg-success-green text-white rounded-full p-2">
+                            <BookOpen className="h-4 w-4" />
+                          </div>
+                        )}
+                      </div>
+                    </CardHeader>
+                    
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        {/* Progress Bar */}
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-playful">Progress</span>
+                            <span className="font-bold">{story.progress}%</span>
+                          </div>
+                          <div className="w-full bg-muted rounded-full h-2">
+                            <div 
+                              className="bg-primary h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${story.progress}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Rating */}
+                        {story.rating > 0 && (
+                          <div className="flex items-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-4 w-4 ${
+                                  i < story.rating 
+                                    ? "fill-accent text-accent" 
+                                    : "text-muted-foreground"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                    
+                    <CardFooter className="p-4 pt-0">
+                      <Link to="/story-reader" className="w-full">
+                        <Button variant="outline" size="sm" className="w-full font-playful">
+                          <Play className="h-4 w-4 mr-2" />
+                          {story.progress === 100 ? "Read Again" : "Continue"}
+                        </Button>
+                      </Link>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Add More Stories */}
+              <div className="text-center pt-8">
+                <Link to="/create-character">
+                  <Button variant="whimsical" size="lg" className="font-playful">
+                    <BookOpen className="h-5 w-5 mr-2" />
+                    Create New Adventure
+                  </Button>
+                </Link>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="neverland" className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-headline font-bold text-primary mb-4">
+                  Trip to NeverLand
+                </h2>
+                <div className="max-w-2xl mx-auto">
+                  <img 
+                    src={neverlandCover}
+                    alt="Trip to NeverLand"
+                    className="w-full rounded-xl shadow-magical"
+                  />
+                  <div className="mt-6 p-6 bg-card rounded-xl border-2 border-border">
+                    <p className="font-playful text-lg text-foreground leading-relaxed">
+                      Join our hero on an incredible journey to the magical land of NeverLand, 
+                      where dreams come true and adventures never end!
+                    </p>
+                    <Link to="/story-reader" className="block mt-4">
+                      <Button variant="whimsical" size="lg" className="font-playful">
+                        <Play className="h-5 w-5 mr-2" />
+                        Start Adventure
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
-              <h3 className="font-playful font-bold text-lg text-center leading-tight">Trip to<br />NeverLand</h3>
-            </div>
-            
-            <div className="flex flex-col items-center group cursor-pointer" onClick={() => window.location.href = '/story-reader'}>
-              <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-purple-500 via-orange-400 to-yellow-400 p-6 mb-4 relative overflow-hidden hover-scale">
-                {/* Archer silhouette */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-16 bg-black relative">
-                    {/* Body */}
-                    <div className="w-6 h-8 bg-black rounded-full mx-auto"></div>
-                    {/* Bow */}
-                    <div className="absolute -right-2 top-2 w-8 h-12 border-2 border-black rounded-full border-r-transparent"></div>
-                    {/* Arrow */}
-                    <div className="absolute right-0 top-6 w-6 h-0.5 bg-black"></div>
-                  </div>
-                </div>
-                {/* Greek border pattern */}
-                <div className="absolute inset-2 border-4 border-yellow-600 rounded-2xl opacity-60" style={{
-                  borderImage: 'repeating-linear-gradient(45deg, transparent, transparent 4px, currentColor 4px, currentColor 8px) 4'
-                }}></div>
-              </div>
-              <h3 className="font-playful font-bold text-lg text-center">Odyssy</h3>
-            </div>
-            
-            <div className="flex flex-col items-center group cursor-pointer" onClick={() => window.location.href = '/story-reader'}>
-              <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-red-500 to-green-500 p-6 mb-4 relative overflow-hidden hover-scale">
-                {/* Christmas tree */}
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-                  {/* Tree layers */}
-                  <div className="w-8 h-6 bg-green-600 rounded-t-full mb-1"></div>
-                  <div className="w-10 h-6 bg-green-600 rounded-t-full mb-1 -ml-1"></div>
-                  <div className="w-12 h-8 bg-green-600 rounded-t-full -ml-2"></div>
-                  {/* Trunk */}
-                  <div className="w-2 h-3 bg-amber-700 mx-auto"></div>
-                </div>
-                {/* Stars */}
-                <div className="absolute top-4 right-4">
-                  <div className="w-2 h-2 bg-yellow-300 rounded-full mb-2"></div>
-                  <div className="w-1.5 h-1.5 bg-yellow-300 rounded-full ml-3"></div>
-                </div>
-                {/* Holly leaves */}
-                <div className="absolute top-6 left-4">
-                  <div className="w-4 h-2 bg-green-700 rounded-full"></div>
-                  <div className="w-1 h-1 bg-red-500 rounded-full ml-1.5 -mt-0.5"></div>
-                </div>
-              </div>
-              <h3 className="font-playful font-bold text-lg text-center">First Christmas</h3>
-            </div>
-            
-            {/* Bottom Row - Additional Stories */}
-            <div className="flex flex-col items-center group cursor-pointer">
-              <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-gray-300 to-gray-400 p-6 mb-4 relative overflow-hidden hover-scale">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Doctor character */}
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-amber-600 rounded-full mb-2 mx-auto"></div>
-                    <div className="w-12 h-16 bg-white rounded-lg border-2 border-gray-400"></div>
-                    {/* Stethoscope */}
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                      <div className="w-6 h-0.5 bg-gray-700 rounded-full"></div>
-                      <div className="w-2 h-2 bg-red-500 rounded-full ml-2 -mt-1"></div>
-                    </div>
+            </TabsContent>
+
+            <TabsContent value="christmas" className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-headline font-bold text-primary mb-4">
+                  Odyssey First Christmas
+                </h2>
+                <div className="max-w-2xl mx-auto">
+                  <img 
+                    src={christmasCover}
+                    alt="Odyssey First Christmas"
+                    className="w-full rounded-xl shadow-magical"
+                  />
+                  <div className="mt-6 p-6 bg-card rounded-xl border-2 border-border">
+                    <p className="font-playful text-lg text-foreground leading-relaxed">
+                      Experience the wonder and magic of Christmas through the eyes of our 
+                      young hero in this heartwarming holiday adventure!
+                    </p>
+                    <Link to="/story-reader" className="block mt-4">
+                      <Button variant="whimsical" size="lg" className="font-playful">
+                        <Play className="h-5 w-5 mr-2" />
+                        Start Adventure
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
-              <h3 className="font-playful font-bold text-lg text-center">It's Terminal</h3>
-            </div>
-            
-            <div className="flex flex-col items-center group cursor-pointer">
-              <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-pink-300 to-yellow-300 p-6 mb-4 relative overflow-hidden hover-scale">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {/* City buildings */}
-                  <div className="flex items-end gap-1">
-                    <div className="w-3 h-12 bg-gray-700"></div>
-                    <div className="w-4 h-16 bg-gray-800"></div>
-                    <div className="w-3 h-10 bg-gray-700"></div>
-                    <div className="w-2 h-14 bg-gray-600"></div>
-                  </div>
-                  {/* Plane silhouette */}
-                  <div className="absolute top-6 right-8">
-                    <div className="w-8 h-2 bg-black"></div>
-                    <div className="absolute top-0 left-6 w-3 h-1 bg-black"></div>
-                  </div>
-                </div>
-              </div>
-              <h3 className="font-playful font-bold text-lg text-center leading-tight">Bush Did<br />What?</h3>
-            </div>
-            
-            <div className="flex flex-col items-center group cursor-pointer" onClick={() => window.location.href = '/create-character'}>
-              <div className="w-full aspect-square rounded-3xl bg-gradient-to-br from-gray-200 to-gray-300 p-6 mb-4 relative overflow-hidden flex items-center justify-center hover-scale border-2 border-dashed border-gray-400">
-                <div className="text-6xl text-gray-600 font-bold">+</div>
-              </div>
-              <h3 className="font-playful font-bold text-lg text-center">Add Stories</h3>
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
 
