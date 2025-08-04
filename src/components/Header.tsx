@@ -22,9 +22,9 @@ const Header = () => {
         <div className="flex-1 flex justify-end">
           <Link to="/profile">
             <Button 
-              variant={location.pathname === "/profile" ? "default" : "ghost"} 
+              variant="default" 
               size="sm" 
-              className="flex items-center gap-2 text-primary-foreground border-primary-foreground/20 hover:bg-primary-foreground/10"
+              className="flex items-center gap-2"
             >
               <User className="h-4 w-4" />
               <span className="hidden md:inline">Profile</span>
