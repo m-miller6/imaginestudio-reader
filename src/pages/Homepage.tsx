@@ -35,6 +35,7 @@ const Homepage = () => {
   const [showTopTen, setShowTopTen] = useState(false);
   const [showInteractive, setShowInteractive] = useState(false);
   const [showEducational, setShowEducational] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const featuredBooks = [
     {
@@ -90,9 +91,14 @@ const Homepage = () => {
   const getFilteredStories = (category: string) => {
     const filtered = storyCategories.filter(story => {
       const categoryKey = category.toLowerCase().replace(/\s+/g, '');
-      if (categoryKey === 'suggested') return story.category === 'suggested';
-      if (categoryKey === 'continuereading') return story.category === 'continue';
-      if (categoryKey === 'newthisweek') return story.category === 'new';
+      const matchesSearch = searchQuery === "" || 
+        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.genre.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      if (categoryKey === 'suggested') return story.category === 'suggested' && matchesSearch;
+      if (categoryKey === 'continuereading') return story.category === 'continue' && matchesSearch;
+      if (categoryKey === 'newthisweek') return story.category === 'new' && matchesSearch;
       return false;
     });
 
@@ -101,28 +107,47 @@ const Homepage = () => {
 
   const getTopTenStories = () => {
     return storyCategories
-      .filter(story => story.ranking && story.ranking <= 10)
+      .filter(story => {
+        const matchesSearch = searchQuery === "" || 
+          story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          story.genre.toLowerCase().includes(searchQuery.toLowerCase());
+        return story.ranking && story.ranking <= 10 && matchesSearch;
+      })
       .sort((a, b) => (a.ranking || 999) - (b.ranking || 999));
   };
 
   const getInteractiveStoriesByGenre = () => {
-    const interactiveStories = storyCategories.filter(story => story.interactive);
+    const interactiveStories = storyCategories.filter(story => {
+      const matchesSearch = searchQuery === "" || 
+        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.genre.toLowerCase().includes(searchQuery.toLowerCase());
+      return story.interactive && matchesSearch;
+    });
     const genres = [...new Set(interactiveStories.map(story => story.genre))];
     
     return genres.map(genre => ({
       genre,
       stories: interactiveStories.filter(story => story.genre === genre)
-    }));
+    })).filter(genreGroup => genreGroup.stories.length > 0);
   };
 
   const getEducationalStoriesBySubject = () => {
-    const educationalStories = storyCategories.filter(story => story.educational);
+    const educationalStories = storyCategories.filter(story => {
+      const matchesSearch = searchQuery === "" || 
+        story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        story.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (story.subject && story.subject.toLowerCase().includes(searchQuery.toLowerCase()));
+      return story.educational && matchesSearch;
+    });
     const subjects = [...new Set(educationalStories.map(story => story.subject).filter(Boolean))];
     
     return subjects.map(subject => ({
       subject,
       stories: educationalStories.filter(story => story.subject === subject)
-    }));
+    })).filter(subjectGroup => subjectGroup.stories.length > 0);
   };
 
   return (
@@ -217,6 +242,8 @@ const Homepage = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search stories..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 rounded-xl border-2 border-border focus:border-primary"
               />
             </div>

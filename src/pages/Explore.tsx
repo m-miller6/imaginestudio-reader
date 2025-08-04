@@ -45,6 +45,23 @@ const Explore = () => {
     { title: "Forest Friends", image: forestFriendsCover, isNew: true },
   ];
 
+  const filteredFeaturedStories = featuredStories.filter(story => 
+    searchQuery === "" || 
+    story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    story.genre.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredNewReleases = newReleases.filter(story =>
+    searchQuery === "" ||
+    story.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredCategories = categories.filter(category =>
+    searchQuery === "" ||
+    category.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -76,7 +93,7 @@ const Explore = () => {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-headline font-bold mb-6 text-foreground">Browse by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {categories.map((category) => (
+            {filteredCategories.map((category) => (
               <Card key={category.name} className="card-magical cursor-pointer hover:scale-105 transition-transform">
                 <CardContent className="p-4 text-center">
                   <div className={`w-12 h-12 ${category.color} rounded-full mx-auto mb-3 flex items-center justify-center`}>
@@ -103,7 +120,7 @@ const Explore = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredStories.map((story, index) => (
+            {filteredFeaturedStories.map((story, index) => (
               <Link key={index} to="/create-character">
                 <Card className="card-magical bg-card border-2 border-border overflow-hidden hover:scale-105 transition-transform">
                   <div className="aspect-video relative">
@@ -156,7 +173,7 @@ const Explore = () => {
           
           <Carousel className="w-full">
             <CarouselContent className="-ml-2 md:-ml-4">
-              {newReleases.map((story, index) => (
+              {filteredNewReleases.map((story, index) => (
                 <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/4">
                   <Link to="/create-character">
                     <Card className="card-magical bg-card border-2 border-border overflow-hidden hover:scale-105 transition-transform">
