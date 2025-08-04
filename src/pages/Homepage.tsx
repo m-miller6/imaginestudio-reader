@@ -8,6 +8,26 @@ import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import neverlandCover from "@/assets/trip-to-neverland-cover.jpg";
 import christmasCover from "@/assets/odyssey-first-christmas-cover.jpg";
+import spaceExplorerCover from "@/assets/space-explorer-cover.jpg";
+import princessCastleCover from "@/assets/princess-castle-cover.jpg";
+import oceanAdventureCover from "@/assets/ocean-adventure-cover.jpg";
+import forestFriendsCover from "@/assets/forest-friends-cover.jpg";
+import dinosaurDiscoveryCover from "@/assets/dinosaur-discovery-cover.jpg";
+import magicGardenCover from "@/assets/magic-garden-cover.jpg";
+import pirateTreasureCover from "@/assets/pirate-treasure-cover.jpg";
+import fairyKingdomCover from "@/assets/fairy-kingdom-cover.jpg";
+import robotFriendsCover from "@/assets/robot-friends-cover.jpg";
+import dragonValleyCover from "@/assets/dragon-valley-cover.jpg";
+import underwaterCityCover from "@/assets/underwater-city-cover.jpg";
+import timeTravelerCover from "@/assets/time-traveler-cover.jpg";
+import jungleExplorerCover from "@/assets/jungle-explorer-cover.jpg";
+import iceKingdomCover from "@/assets/ice-kingdom-cover.jpg";
+import superheroAcademyCover from "@/assets/superhero-academy-cover.jpg";
+import alienEncounterCover from "@/assets/alien-encounter-cover.jpg";
+import wizardSchoolCover from "@/assets/wizard-school-cover.jpg";
+import animalRescueCover from "@/assets/animal-rescue-cover.jpg";
+import mysteryMansionCover from "@/assets/mystery-mansion-cover.jpg";
+import sportsChampionCover from "@/assets/sports-champion-cover.jpg";
 
 const Homepage = () => {
   const featuredBooks = [
@@ -23,42 +43,42 @@ const Homepage = () => {
     },
     {
       title: "Space Explorer",
-      image: neverlandCover,
+      image: spaceExplorerCover,
       description: "Journey to distant galaxies"
     },
     {
       title: "Princess Castle",
-      image: christmasCover,
+      image: princessCastleCover,
       description: "Royal adventures await"
     },
     {
       title: "Ocean Adventure",
-      image: neverlandCover,
+      image: oceanAdventureCover,
       description: "Dive into underwater mysteries"
     }
   ];
 
   const storyCategories = [
-    { title: "Ocean Adventure", category: "suggested", progress: 0, image: neverlandCover, description: "Dive deep into the blue seas" },
-    { title: "Space Explorer", category: "continue", progress: 35, image: christmasCover, description: "Journey through the cosmos" },
-    { title: "Forest Friends", category: "new", progress: 0, image: neverlandCover, description: "Meet woodland creatures" },
-    { title: "Princess Castle", category: "suggested", progress: 0, image: christmasCover, description: "Royal adventures await" },
-    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: neverlandCover, description: "Prehistoric adventures" },
-    { title: "Magic Garden", category: "new", progress: 0, image: christmasCover, description: "Enchanted plant kingdom" },
-    { title: "Pirate Treasure", category: "suggested", progress: 0, image: neverlandCover, description: "Hunt for buried gold" },
-    { title: "Fairy Kingdom", category: "continue", progress: 20, image: christmasCover, description: "Magical realm awaits" },
-    { title: "Robot Friends", category: "new", progress: 0, image: neverlandCover, description: "Future technology adventures" },
-    { title: "Dragon Valley", category: "continue", progress: 75, image: christmasCover, description: "Befriend mighty dragons" },
-    { title: "Underwater City", category: "continue", progress: 45, image: neverlandCover, description: "Explore Atlantis mysteries" },
-    { title: "Time Traveler", category: "continue", progress: 15, image: christmasCover, description: "Journey through time" },
-    { title: "Jungle Explorer", category: "continue", progress: 80, image: neverlandCover, description: "Discover hidden temples" },
-    { title: "Ice Kingdom", category: "continue", progress: 30, image: christmasCover, description: "Frozen wonderland adventure" },
-    { title: "Superhero Academy", category: "new", progress: 0, image: neverlandCover, description: "Train your superpowers" },
-    { title: "Alien Encounter", category: "new", progress: 0, image: christmasCover, description: "Meet friendly aliens" },
-    { title: "Wizard School", category: "new", progress: 0, image: neverlandCover, description: "Learn magical spells" },
-    { title: "Animal Rescue", category: "new", progress: 0, image: christmasCover, description: "Save endangered animals" },
-    { title: "Mystery Mansion", category: "new", progress: 0, image: neverlandCover, description: "Solve spooky puzzles" },
-    { title: "Sports Champion", category: "new", progress: 0, image: christmasCover, description: "Become a sports star" },
+    { title: "Ocean Adventure", category: "suggested", progress: 0, image: oceanAdventureCover, description: "Dive deep into the blue seas" },
+    { title: "Space Explorer", category: "continue", progress: 35, image: spaceExplorerCover, description: "Journey through the cosmos" },
+    { title: "Forest Friends", category: "new", progress: 0, image: forestFriendsCover, description: "Meet woodland creatures" },
+    { title: "Princess Castle", category: "suggested", progress: 0, image: princessCastleCover, description: "Royal adventures await" },
+    { title: "Dinosaur Discovery", category: "continue", progress: 60, image: dinosaurDiscoveryCover, description: "Prehistoric adventures" },
+    { title: "Magic Garden", category: "new", progress: 0, image: magicGardenCover, description: "Enchanted plant kingdom" },
+    { title: "Pirate Treasure", category: "suggested", progress: 0, image: pirateTreasureCover, description: "Hunt for buried gold" },
+    { title: "Fairy Kingdom", category: "continue", progress: 20, image: fairyKingdomCover, description: "Magical realm awaits" },
+    { title: "Robot Friends", category: "new", progress: 0, image: robotFriendsCover, description: "Future technology adventures" },
+    { title: "Dragon Valley", category: "continue", progress: 75, image: dragonValleyCover, description: "Befriend mighty dragons" },
+    { title: "Underwater City", category: "continue", progress: 45, image: underwaterCityCover, description: "Explore Atlantis mysteries" },
+    { title: "Time Traveler", category: "continue", progress: 15, image: timeTravelerCover, description: "Journey through time" },
+    { title: "Jungle Explorer", category: "continue", progress: 80, image: jungleExplorerCover, description: "Discover hidden temples" },
+    { title: "Ice Kingdom", category: "continue", progress: 30, image: iceKingdomCover, description: "Frozen wonderland adventure" },
+    { title: "Superhero Academy", category: "new", progress: 0, image: superheroAcademyCover, description: "Train your superpowers" },
+    { title: "Alien Encounter", category: "new", progress: 0, image: alienEncounterCover, description: "Meet friendly aliens" },
+    { title: "Wizard School", category: "new", progress: 0, image: wizardSchoolCover, description: "Learn magical spells" },
+    { title: "Animal Rescue", category: "new", progress: 0, image: animalRescueCover, description: "Save endangered animals" },
+    { title: "Mystery Mansion", category: "new", progress: 0, image: mysteryMansionCover, description: "Solve spooky puzzles" },
+    { title: "Sports Champion", category: "new", progress: 0, image: sportsChampionCover, description: "Become a sports star" },
   ];
 
   return (
