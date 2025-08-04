@@ -43,6 +43,7 @@ const Library = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <Navigation />
       
       <main className="flex-1 p-6">
         <div className="max-w-6xl mx-auto">
@@ -216,8 +217,6 @@ const Library = () => {
           </Tabs>
         </div>
       </main>
-
-      <Navigation />
     </div>
   );
 };

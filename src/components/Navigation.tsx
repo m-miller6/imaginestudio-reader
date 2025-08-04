@@ -6,8 +6,8 @@ const Navigation = () => {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-sm border-t-2 border-border p-6 md:static md:bg-transparent md:border-t-0 md:p-0">
-      <div className="flex justify-center items-center gap-6 md:gap-8">
+    <nav className="w-full bg-card/95 backdrop-blur-sm border-y-2 border-border py-4">
+      <div className="max-w-4xl mx-auto flex justify-center items-center gap-6 md:gap-8 px-6">
         <Link to="/">
           <Button 
             variant={location.pathname === "/" ? "default" : "ghost"} 

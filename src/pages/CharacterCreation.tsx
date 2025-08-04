@@ -41,6 +41,7 @@ const CharacterCreation = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <Navigation />
       
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-2xl">
@@ -169,8 +170,6 @@ const CharacterCreation = () => {
           </Card>
         </div>
       )}
-
-      <Navigation />
     </div>
   );
 };

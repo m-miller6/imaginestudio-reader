@@ -65,6 +65,7 @@ const Explore = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <Navigation />
       
       {/* Hero Section with Search */}
       <section className="p-6 bg-hero-gradient">
@@ -206,10 +207,6 @@ const Explore = () => {
         </div>
       </section>
 
-      {/* Spacer above navigation */}
-      <div className="h-8"></div>
-
-      <Navigation />
     </div>
   );
 };

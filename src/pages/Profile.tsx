@@ -25,6 +25,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <Navigation />
       
       <main className="flex-1 p-6">
         <div className="max-w-4xl mx-auto space-y-8">
@@ -187,8 +188,6 @@ const Profile = () => {
           </Card>
         </div>
       </main>
-
-      <Navigation />
     </div>
   );
 };

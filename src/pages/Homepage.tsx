@@ -153,6 +153,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <Navigation />
       
       {/* Hero Section with Featured Books */}
       <section className="p-6 bg-hero-gradient">
@@ -471,10 +472,6 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* Spacer above navigation */}
-      <div className="h-8"></div>
-
-      <Navigation />
     </div>
   );
 };
