@@ -86,7 +86,7 @@ const Homepage = () => {
   ];
 
   const getFilteredStories = (category: string) => {
-    let filtered = storyCategories.filter(story => {
+    const filtered = storyCategories.filter(story => {
       const categoryKey = category.toLowerCase().replace(/\s+/g, '');
       if (categoryKey === 'suggested') return story.category === 'suggested';
       if (categoryKey === 'continuereading') return story.category === 'continue';
@@ -94,12 +94,13 @@ const Homepage = () => {
       return false;
     });
 
-    if (showTopTen) {
-      filtered = filtered.filter(story => story.ranking && story.ranking <= 10);
-      filtered.sort((a, b) => (a.ranking || 999) - (b.ranking || 999));
-    }
-
     return filtered;
+  };
+
+  const getTopTenStories = () => {
+    return storyCategories
+      .filter(story => story.ranking && story.ranking <= 10)
+      .sort((a, b) => (a.ranking || 999) - (b.ranking || 999));
   };
 
   return (
@@ -177,67 +178,113 @@ const Homepage = () => {
             </div>
           </div>
 
-          {/* Story Categories */}
-          <div className="space-y-8">
-            {["Suggested", "Continue Reading", "New this Week"].map((category) => (
-              <div key={category}>
-                <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
-                  {category}
-                </h3>
-                
-                <Carousel className="w-full">
-                  <CarouselContent className="-ml-2 md:-ml-4">
-                    {getFilteredStories(category).map((story, index) => (
-                        <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
-                          <Link to="/create-character" className="block">
-                            <Card className="card-magical bg-card border-2 border-border overflow-hidden">
-                              <div className="aspect-video relative">
-                                <img 
-                                  src={story.image} 
-                                  alt={story.title}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                                {story.ranking && (
-                                  <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-bold text-sm px-2 py-1">
-                                    #{story.ranking}
-                                  </Badge>
-                                )}
-                                <div className="absolute bottom-4 left-4 text-white">
-                                  <h4 className="text-lg font-headline font-bold text-shadow-soft">
-                                    {story.title}
-                                  </h4>
-                                  <p className="font-playful text-sm">{story.description}</p>
-                                </div>
-                              </div>
-                              
-                              {story.progress > 0 && (
-                                <CardFooter className="p-4">
-                                  <div className="w-full">
-                                    <div className="flex justify-between text-sm mb-1">
-                                      <span className="font-playful">Progress</span>
-                                      <span className="font-bold">{story.progress}%</span>
-                                    </div>
-                                    <div className="w-full bg-muted rounded-full h-2">
-                                      <div 
-                                        className="bg-primary h-2 rounded-full transition-all duration-300"
-                                        style={{ width: `${story.progress}%` }}
-                                      />
-                                    </div>
-                                  </div>
-                                </CardFooter>
-                              )}
-                            </Card>
-                          </Link>
-                        </CarouselItem>
-                      ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="hidden md:flex" />
-                  <CarouselNext className="hidden md:flex" />
-                </Carousel>
+          {/* Story Categories or Top 10 */}
+          {showTopTen ? (
+            <div>
+              <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
+                Top 10 Stories
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {getTopTenStories().map((story, index) => (
+                  <Link key={index} to="/create-character" className="block">
+                    <Card className="card-magical bg-card border-2 border-border overflow-hidden">
+                      <div className="aspect-video relative">
+                        <img 
+                          src={story.image} 
+                          alt={story.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-bold text-sm px-2 py-1">
+                          #{story.ranking}
+                        </Badge>
+                        <div className="absolute bottom-4 left-4 text-white">
+                          <h4 className="text-lg font-headline font-bold text-shadow-soft">
+                            {story.title}
+                          </h4>
+                          <p className="font-playful text-sm">{story.description}</p>
+                        </div>
+                      </div>
+                      
+                      {story.progress > 0 && (
+                        <CardFooter className="p-4">
+                          <div className="w-full">
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="font-playful">Progress</span>
+                              <span className="font-bold">{story.progress}%</span>
+                            </div>
+                            <div className="w-full bg-muted rounded-full h-2">
+                              <div 
+                                className="bg-primary h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${story.progress}%` }}
+                              />
+                            </div>
+                          </div>
+                        </CardFooter>
+                      )}
+                    </Card>
+                  </Link>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className="space-y-8">
+              {["Suggested", "Continue Reading", "New this Week"].map((category) => (
+                <div key={category}>
+                  <h3 className="text-xl font-headline font-bold mb-4 text-foreground">
+                    {category}
+                  </h3>
+                  
+                  <Carousel className="w-full">
+                    <CarouselContent className="-ml-2 md:-ml-4">
+                      {getFilteredStories(category).map((story, index) => (
+                          <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                            <Link to="/create-character" className="block">
+                              <Card className="card-magical bg-card border-2 border-border overflow-hidden">
+                                <div className="aspect-video relative">
+                                  <img 
+                                    src={story.image} 
+                                    alt={story.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                                  <div className="absolute bottom-4 left-4 text-white">
+                                    <h4 className="text-lg font-headline font-bold text-shadow-soft">
+                                      {story.title}
+                                    </h4>
+                                    <p className="font-playful text-sm">{story.description}</p>
+                                  </div>
+                                </div>
+                                
+                                {story.progress > 0 && (
+                                  <CardFooter className="p-4">
+                                    <div className="w-full">
+                                      <div className="flex justify-between text-sm mb-1">
+                                        <span className="font-playful">Progress</span>
+                                        <span className="font-bold">{story.progress}%</span>
+                                      </div>
+                                      <div className="w-full bg-muted rounded-full h-2">
+                                        <div 
+                                          className="bg-primary h-2 rounded-full transition-all duration-300"
+                                          style={{ width: `${story.progress}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </CardFooter>
+                                )}
+                              </Card>
+                            </Link>
+                          </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="hidden md:flex" />
+                    <CarouselNext className="hidden md:flex" />
+                  </Carousel>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
