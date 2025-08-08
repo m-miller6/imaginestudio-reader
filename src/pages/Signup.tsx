@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
+import SignupSuccessDialog from "@/components/SignupSuccessDialog";
 
 const signupSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -27,8 +30,9 @@ const signupSchema = z.object({
 type SignupForm = z.infer<typeof signupSchema>;
 
 const Signup = () => {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const { toast } = useToast();
   
   const {
     register,
@@ -53,9 +57,73 @@ const Signup = () => {
     return confirmPwd === originalPwd && originalPwd.length > 0;
   };
 
-  const onSubmit = (data: SignupForm) => {
-    console.log("Signup data:", data);
-    // TODO: Implement actual signup logic with Supabase
+  const onSubmit = async (data: SignupForm) => {
+    setIsLoading(true);
+    
+    try {
+      // Check if user already exists by attempting to sign up
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            adventurer_name: data.adventurerName,
+          }
+        }
+      });
+
+      if (authError) {
+        if (authError.message.includes("already registered")) {
+          toast({
+            title: "Account already exists",
+            description: "An account with this email already exists. Please log in instead.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Signup failed",
+            description: authError.message,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      if (authData.user) {
+        // Create profile record
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            adventurer_name: data.adventurerName,
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          toast({
+            title: "Account created",
+            description: "Account created successfully, but there was an issue saving your profile.",
+            variant: "default",
+          });
+        }
+
+        // Show success dialog
+        setShowSuccessDialog(true);
+      }
+    } catch (error) {
+      toast({
+        title: "Unexpected error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getPasswordInputClass = () => {
@@ -165,8 +233,8 @@ const Signup = () => {
                   )}
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Create Account
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Creating Account..." : "Create Account"}
                 </Button>
 
                 <div className="text-center">
@@ -179,6 +247,11 @@ const Signup = () => {
           </Card>
         </div>
       </div>
+
+      <SignupSuccessDialog 
+        open={showSuccessDialog} 
+        onOpenChange={setShowSuccessDialog} 
+      />
     </div>
   );
 };
