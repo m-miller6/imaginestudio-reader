@@ -65,11 +65,11 @@ const Header = () => {
                 <span className="hidden md:inline">Log In</span>
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[425px] sm:min-h-[500px]">
               <DialogHeader>
-                <DialogTitle>Log In to imAgIne Studios</DialogTitle>
+                <DialogTitle className="text-center text-xl">Log In to imAgIne Studios</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
+              <div className="grid gap-6 py-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -93,6 +93,11 @@ const Header = () => {
                 <Button type="submit" className="w-full">
                   Log In
                 </Button>
+                <div className="text-center">
+                  <button className="text-sm text-primary hover:underline">
+                    New Adventurer? Create an account now!
+                  </button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
