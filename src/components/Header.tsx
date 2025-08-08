@@ -94,9 +94,9 @@ const Header = () => {
                   Log In
                 </Button>
                 <div className="text-center">
-                  <button className="text-sm text-primary hover:underline">
+                  <Link to="/signup" className="text-sm text-primary hover:underline">
                     New Adventurer? Create an account now!
-                  </button>
+                  </Link>
                 </div>
               </div>
             </DialogContent>
