@@ -1,9 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
-import { User } from "lucide-react";
+import { User, LogIn } from "lucide-react";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { useState } from "react";
 
 const Header = () => {
   const location = useLocation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   
   return (
     <header className="bg-white p-6 shadow-soft relative overflow-hidden">
@@ -47,7 +53,50 @@ const Header = () => {
           </p>
         </Link>
         
-        <div className="flex-1 flex justify-end">
+        <div className="flex-1 flex justify-end items-center gap-3">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="flex items-center gap-2 text-black hover:bg-gray-100"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden md:inline">Log In</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Log In to imAgIne Studios</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Log In
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <Link to="/profile">
             <Button 
               variant="default" 
