@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           adventurer_name: string
           created_at: string
+          email: string | null
           first_name: string
           id: string
           last_name: string
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           adventurer_name: string
           created_at?: string
+          email?: string | null
           first_name: string
           id?: string
           last_name: string
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           adventurer_name?: string
           created_at?: string
+          email?: string | null
           first_name?: string
           id?: string
           last_name?: string
