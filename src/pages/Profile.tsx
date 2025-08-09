@@ -8,11 +8,21 @@ import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import { useSubscription } from '@/hooks/useSubscription';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const { subscription, loading, checkSubscription, createCheckout, openCustomerPortal } = useSubscription();
   const { toast } = useToast();
+  const { user, profile, loading: authLoading, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     // Check for success/cancelled URL params
@@ -36,20 +46,8 @@ const Profile = () => {
   }, [checkSubscription, toast]);
 
   const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "You have been logged out of your account.",
-      });
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast({
-        title: "Error signing out",
-        description: "Please try again.",
-        variant: "destructive",
-      });
-    }
+    await signOut();
+    navigate('/');
   };
 
   const formatDate = (dateString: string | null) => {
@@ -61,15 +59,34 @@ const Profile = () => {
     });
   };
 
-  const user = {
-    name: "Joe",
-    email: "joe@example.com",
-    avatar: null,
-    stats: {
-      storiesCompleted: 12,
-      charactersCreated: 3,
-      favoriteGenre: "Adventure"
-    }
+  // Show loading state
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <Navigation />
+        <main className="flex-1 p-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center py-20">
+              <RefreshCw className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading your profile...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Don't render if no user (will redirect)
+  if (!user || !profile) {
+    return null;
+  }
+
+  // Mock stats for now - can be replaced with real data later
+  const userStats = {
+    storiesCompleted: 12,
+    charactersCreated: 3,
+    favoriteGenre: "Adventure"
   };
 
   return (
@@ -84,15 +101,14 @@ const Profile = () => {
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <Avatar className="h-24 w-24 border-4 border-white shadow-soft">
-                  <AvatarImage src={user.avatar || undefined} />
                   <AvatarFallback className="text-2xl font-headline font-bold bg-primary text-primary-foreground">
-                    {user.name.charAt(0)}
+                    {(profile.first_name || profile.adventurer_name || 'A').charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 
                 <div className="text-center md:text-left flex-1">
                   <h2 className="text-3xl font-headline font-bold text-primary-foreground mb-2">
-                    Hi {user.name}!
+                    Hi {profile.first_name || profile.adventurer_name || 'Adventurer'}!
                   </h2>
                   <p className="font-playful text-primary-foreground/90 text-lg">
                     Welcome back to your magical journey
@@ -177,7 +193,7 @@ const Profile = () => {
             <Card className="shadow-soft border-2 border-border">
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-2xl font-headline font-bold text-primary">
-                  {user.stats.storiesCompleted}
+                  {userStats.storiesCompleted}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
@@ -188,7 +204,7 @@ const Profile = () => {
             <Card className="shadow-soft border-2 border-border">
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-2xl font-headline font-bold text-accent-foreground">
-                  {user.stats.charactersCreated}
+                  {userStats.charactersCreated}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
@@ -199,7 +215,7 @@ const Profile = () => {
             <Card className="shadow-soft border-2 border-border">
               <CardHeader className="text-center pb-2">
                 <CardTitle className="text-lg font-headline font-bold text-secondary-foreground">
-                  {user.stats.favoriteGenre}
+                  {userStats.favoriteGenre}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center">
@@ -326,13 +342,22 @@ const Profile = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="font-playful font-semibold text-foreground">Email</p>
-                  <p className="text-muted-foreground">{user.email}</p>
+                  <p className="text-muted-foreground">{profile.email || user.email}</p>
                 </div>
                 <div>
                   <p className="font-playful font-semibold text-foreground">Member Since</p>
-                  <p className="text-muted-foreground">January 2024</p>
+                  <p className="text-muted-foreground">{formatDate(profile.created_at)}</p>
                 </div>
               </div>
+              
+              {profile.adventurer_name && (
+                <div className="pt-4 border-t border-border">
+                  <div>
+                    <p className="font-playful font-semibold text-foreground">Adventurer Name</p>
+                    <p className="text-muted-foreground">{profile.adventurer_name}</p>
+                  </div>
+                </div>
+              )}
               
               <div className="pt-4 border-t border-border">
                 <Button 
