@@ -68,7 +68,7 @@ const Header = () => {
             <DialogContent className="sm:max-w-[425px] sm:min-h-[500px]">
               <DialogHeader className="text-center">
                 <div className="mb-6">
-                  <p className="text-lg font-playful text-muted-foreground mb-2">
+                  <p className="text-lg font-playful text-black mb-2 text-center">
                     Welcome back to
                   </p>
                   <div className="flex flex-col items-center">
