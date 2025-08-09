@@ -1,1 +1,5 @@
 project_id = "sblomrejdmexbcikxvqw"
+
+[functions.check-subscription]
+[functions.create-checkout]
+[functions.customer-portal]

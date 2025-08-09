@@ -1,20 +1,70 @@
-import { User, Crown, Settings, CreditCard, LogOut } from "lucide-react";
+import React, { useEffect } from 'react';
+import { User, Crown, Settings, CreditCard, LogOut, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from '@/components/ui/badge';
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
+import { useSubscription } from '@/hooks/useSubscription';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Profile = () => {
+  const { subscription, loading, checkSubscription, createCheckout, openCustomerPortal } = useSubscription();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check for success/cancelled URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success') === 'true') {
+      toast({
+        title: "Subscription successful!",
+        description: "Welcome to your new plan. Refreshing subscription status...",
+      });
+      // Refresh subscription status after successful checkout
+      setTimeout(() => {
+        checkSubscription();
+      }, 2000);
+    } else if (urlParams.get('cancelled') === 'true') {
+      toast({
+        title: "Subscription cancelled",
+        description: "You can subscribe again anytime.",
+        variant: "destructive",
+      });
+    }
+  }, [checkSubscription, toast]);
+
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Error signing out",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   const user = {
     name: "Joe",
     email: "joe@example.com",
     avatar: null,
-    subscription: {
-      plan: "Premium",
-      status: "Active",
-      nextBilling: "2024-02-15"
-    },
     stats: {
       storiesCompleted: 12,
       charactersCreated: 3,
@@ -49,9 +99,20 @@ const Profile = () => {
                   </p>
                   <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
                     <Crown className="h-5 w-5 text-accent" />
-                    <span className="font-playful text-primary-foreground font-semibold">
-                      {user.subscription.plan} Member
-                    </span>
+                    {loading ? (
+                      <Badge variant="secondary" className="bg-gray-100 text-gray-600">
+                        <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                        Loading...
+                      </Badge>
+                    ) : subscription?.subscribed ? (
+                      <span className="font-playful text-primary-foreground font-semibold">
+                        {subscription.subscription_tier} Member
+                      </span>
+                    ) : (
+                      <span className="font-playful text-primary-foreground font-semibold">
+                        Free Member
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -60,21 +121,47 @@ const Profile = () => {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button variant="secondary" size="lg" className="h-auto p-6 font-playful">
+            <Button 
+              variant="secondary" 
+              size="lg" 
+              className="h-auto p-6 font-playful"
+              onClick={checkSubscription}
+              disabled={loading}
+            >
               <div className="text-center">
-                <CreditCard className="h-8 w-8 mx-auto mb-2" />
-                <div className="font-bold">View Subscription</div>
-                <div className="text-sm opacity-75">Manage your plan</div>
+                <RefreshCw className={`h-8 w-8 mx-auto mb-2 ${loading ? 'animate-spin' : ''}`} />
+                <div className="font-bold">Refresh Status</div>
+                <div className="text-sm opacity-75">Check subscription</div>
               </div>
             </Button>
             
-            <Button variant="whimsical" size="lg" className="h-auto p-6 font-playful">
-              <div className="text-center">
-                <Crown className="h-8 w-8 mx-auto mb-2" />
-                <div className="font-bold">Upgrade Plan</div>
-                <div className="text-sm opacity-90">Unlock more features</div>
-              </div>
-            </Button>
+            {subscription?.subscribed ? (
+              <Button 
+                variant="whimsical" 
+                size="lg" 
+                className="h-auto p-6 font-playful"
+                onClick={openCustomerPortal}
+              >
+                <div className="text-center">
+                  <Settings className="h-8 w-8 mx-auto mb-2" />
+                  <div className="font-bold">Manage Subscription</div>
+                  <div className="text-sm opacity-90">Billing & settings</div>
+                </div>
+              </Button>
+            ) : (
+              <Button 
+                variant="whimsical" 
+                size="lg" 
+                className="h-auto p-6 font-playful"
+                onClick={() => createCheckout('premium')}
+              >
+                <div className="text-center">
+                  <Crown className="h-8 w-8 mx-auto mb-2" />
+                  <div className="font-bold">Upgrade Plan</div>
+                  <div className="text-sm opacity-90">Unlock more features</div>
+                </div>
+              </Button>
+            )}
             
             <Button variant="outline" size="lg" className="h-auto p-6 font-playful">
               <div className="text-center">
@@ -130,31 +217,100 @@ const Profile = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <p className="font-playful font-semibold text-foreground">Plan</p>
-                  <p className="text-primary font-bold">{user.subscription.plan}</p>
+              {loading ? (
+                <div className="flex items-center justify-center p-8">
+                  <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Loading subscription details...</span>
                 </div>
-                <div>
-                  <p className="font-playful font-semibold text-foreground">Status</p>
-                  <p className="text-success-green font-bold">{user.subscription.status}</p>
+              ) : subscription?.subscribed ? (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <p className="font-playful font-semibold text-foreground">Plan</p>
+                      <p className="text-primary font-bold">{subscription.subscription_tier}</p>
+                    </div>
+                    <div>
+                      <p className="font-playful font-semibold text-foreground">Status</p>
+                      <p className="text-success-green font-bold">Active</p>
+                    </div>
+                    <div>
+                      <p className="font-playful font-semibold text-foreground">Next Billing</p>
+                      <p className="text-muted-foreground">{formatDate(subscription.subscription_end)}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-border">
+                    <h4 className="font-playful font-semibold mb-2 text-foreground">
+                      {subscription.subscription_tier} Benefits
+                    </h4>
+                    <ul className="space-y-1 text-sm text-muted-foreground">
+                      {subscription.subscription_tier === 'Basic' ? (
+                        <>
+                          <li>• 10 stories per month</li>
+                          <li>• Create up to 3 characters</li>
+                          <li>• Basic story templates</li>
+                          <li>• Email support</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>• Unlimited story creation</li>
+                          <li>• Access to all character customization options</li>
+                          <li>• Priority customer support</li>
+                          <li>• New stories every week</li>
+                          <li>• Save unlimited stories to library</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center p-8 space-y-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h3 className="font-semibold text-gray-900">Free Plan</h3>
+                    <p className="text-sm text-gray-600">You're currently on the free plan</p>
+                  </div>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Upgrade to unlock premium features:
+                    </p>
+                    <div className="grid gap-3">
+                      <div className="flex justify-between items-center p-3 border rounded-lg">
+                        <div className="text-left">
+                          <p className="font-medium">Basic Plan</p>
+                          <p className="text-sm text-muted-foreground">Essential storytelling features</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">$19.99/mo</p>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => createCheckout('basic')}
+                            className="mt-1"
+                          >
+                            Choose Basic
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center p-3 border rounded-lg bg-amber-50 border-amber-200">
+                        <div className="text-left">
+                          <p className="font-medium text-amber-900">Premium Plan</p>
+                          <p className="text-sm text-amber-700">Unlimited everything</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold">$49.99/mo</p>
+                          <Button 
+                            size="sm"
+                            onClick={() => createCheckout('premium')}
+                            className="mt-1"
+                          >
+                            Choose Premium
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-playful font-semibold text-foreground">Next Billing</p>
-                  <p className="text-muted-foreground">{user.subscription.nextBilling}</p>
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t border-border">
-                <h4 className="font-playful font-semibold mb-2 text-foreground">Premium Benefits</h4>
-                <ul className="space-y-1 text-sm text-muted-foreground">
-                  <li>• Unlimited story creation</li>
-                  <li>• Access to all character customization options</li>
-                  <li>• Priority customer support</li>
-                  <li>• New stories every week</li>
-                  <li>• Save unlimited stories to library</li>
-                </ul>
-              </div>
+              )}
             </CardContent>
           </Card>
 
@@ -179,7 +335,11 @@ const Profile = () => {
               </div>
               
               <div className="pt-4 border-t border-border">
-                <Button variant="destructive" className="font-playful">
+                <Button 
+                  variant="destructive" 
+                  className="font-playful"
+                  onClick={handleSignOut}
+                >
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
                 </Button>
