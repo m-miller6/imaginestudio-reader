@@ -66,10 +66,26 @@ const Header = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px] sm:min-h-[500px]">
-              <DialogHeader>
-                <DialogTitle className="text-center text-xl">Log In to imAgIne Studios</DialogTitle>
+              <DialogHeader className="text-center">
+                <div className="mb-6">
+                  <p className="text-lg font-playful text-muted-foreground mb-2">
+                    Welcome back to
+                  </p>
+                  <div className="flex flex-col items-center">
+                    <h1 className="text-3xl font-headline font-bold text-black">
+                      <span className="text-black">im</span>
+                      <span className="text-yellow-500">A</span>
+                      <span className="text-black">g</span>
+                      <span className="text-yellow-500">I</span>
+                      <span className="text-black">ne</span>
+                    </h1>
+                    <p className="text-lg font-playful text-black">
+                      Studios
+                    </p>
+                  </div>
+                </div>
               </DialogHeader>
-              <div className="grid gap-6 py-6">
+              <div className="grid gap-6 py-4">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
