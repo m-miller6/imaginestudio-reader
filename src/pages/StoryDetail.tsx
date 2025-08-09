@@ -184,7 +184,7 @@ const StoryDetail = () => {
                 <p className="font-playful text-lg text-foreground leading-relaxed">
                   {story.description}
                 </p>
-                <Link to="/story-reader" className="block mt-4">
+                <Link to="/create-character" className="block mt-4">
                   <Button variant="whimsical" size="lg" className="font-playful">
                     <Play className="h-5 w-5 mr-2" />
                     Start Adventure
