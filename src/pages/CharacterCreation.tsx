@@ -55,16 +55,16 @@ const CharacterCreation = () => {
             className="bg-card border-2 border-border rounded-xl p-1"
           >
             <ToggleGroupItem 
-              value="library" 
-              className="px-6 py-2 font-playful text-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-lg"
-            >
-              Character Library
-            </ToggleGroupItem>
-            <ToggleGroupItem 
               value="create-new" 
               className="px-6 py-2 font-playful text-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-lg"
             >
               Create New Character
+            </ToggleGroupItem>
+            <ToggleGroupItem 
+              value="library" 
+              className="px-6 py-2 font-playful text-lg data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-lg"
+            >
+              Character Library
             </ToggleGroupItem>
           </ToggleGroup>
         </div>
