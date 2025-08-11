@@ -1,5 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import $ from 'jquery';
+import 'turn.js';
 
 interface PageContent {
   text: string;
@@ -13,12 +15,6 @@ interface PageFlipBookProps {
   className?: string;
 }
 
-declare global {
-  interface Window {
-    $: any;
-    jQuery: any;
-  }
-}
 
 export const PageFlipBook: React.FC<PageFlipBookProps> = ({
   pages,
@@ -33,73 +29,37 @@ export const PageFlipBook: React.FC<PageFlipBookProps> = ({
     const book = bookRef.current;
     if (!book || isInitialized) return;
 
-    // Wait for scripts to load and check if turn.js is available
-    const checkAndInitialize = () => {
-      if (!window.$ || !window.jQuery) {
-        console.log('jQuery not loaded yet');
-        return false;
-      }
-
-      // Check if turn plugin is available
-      if (typeof window.$.fn.turn !== 'function') {
-        console.log('Turn.js plugin not loaded yet');
-        return false;
-      }
-
-      try {
-        // Initialize turn.js
-        const $book = window.$(book);
-        $book.turn({
-          width: 800,
-          height: 600,
-          elevation: 50,
-          gradients: true,
-          autoCenter: true,
-          duration: 1000,
-          pages: pages.length,
-          page: currentPage,
-          when: {
-            turning: function(event: any, page: number) {
-              onPageChange(page);
-            },
-            turned: function(event: any, page: number) {
-              onPageChange(page);
-            }
+    try {
+      // Initialize turn.js with jQuery
+      const $book = $(book);
+      $book.turn({
+        width: 800,
+        height: 600,
+        elevation: 50,
+        gradients: true,
+        autoCenter: true,
+        duration: 1000,
+        pages: pages.length,
+        page: currentPage,
+        when: {
+          turning: function(event: any, page: number) {
+            onPageChange(page);
+          },
+          turned: function(event: any, page: number) {
+            onPageChange(page);
           }
-        });
+        }
+      });
 
-        setIsInitialized(true);
-        console.log('Turn.js initialized successfully');
-        return true;
-      } catch (error) {
-        console.error('Error initializing turn.js:', error);
-        return false;
-      }
-    };
-
-    // Try to initialize immediately
-    if (checkAndInitialize()) {
-      return;
+      setIsInitialized(true);
+      console.log('Turn.js initialized successfully');
+    } catch (error) {
+      console.error('Error initializing turn.js:', error);
     }
 
-    // If not ready, wait for scripts to load
-    const interval = setInterval(() => {
-      if (checkAndInitialize()) {
-        clearInterval(interval);
-      }
-    }, 100);
-
-    // Cleanup interval after 10 seconds
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-      console.error('Turn.js failed to load within 10 seconds');
-    }, 10000);
-
     return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-      if (window.$ && bookRef.current) {
-        const $book = window.$(bookRef.current);
+      if (bookRef.current) {
+        const $book = $(bookRef.current);
         if ($book.turn && typeof $book.turn === 'function') {
           try {
             if ($book.turn('is')) {
@@ -116,9 +76,9 @@ export const PageFlipBook: React.FC<PageFlipBookProps> = ({
   // Update page when currentPage prop changes
   useEffect(() => {
     const book = bookRef.current;
-    if (!book || !window.$ || !isInitialized) return;
+    if (!book || !isInitialized) return;
 
-    const $book = window.$(book);
+    const $book = $(book);
     if ($book.turn('is') && $book.turn('page') !== currentPage) {
       $book.turn('page', currentPage);
     }
@@ -127,16 +87,16 @@ export const PageFlipBook: React.FC<PageFlipBookProps> = ({
   // Fallback swipe gestures for mobile devices
   const swipeHandlers = useSwipeGesture({
     onSwipeLeft: () => {
-      if (window.$ && bookRef.current) {
-        const $book = window.$(bookRef.current);
+      if (bookRef.current) {
+        const $book = $(bookRef.current);
         if ($book.turn('is')) {
           $book.turn('next');
         }
       }
     },
     onSwipeRight: () => {
-      if (window.$ && bookRef.current) {
-        const $book = window.$(bookRef.current);
+      if (bookRef.current) {
+        const $book = $(bookRef.current);
         if ($book.turn('is')) {
           $book.turn('previous');
         }
