@@ -25,9 +25,10 @@ const TurnJSBook = ({ pages, currentPage, onPageChange, className }: TurnJSBookP
 
     const getSize = () => {
       const containerWidth = containerRef.current?.clientWidth || 640;
-      const isSingle = containerWidth < 768;
+      const viewportWidth = window.innerWidth || containerWidth;
       // Keep a pleasant aspect ratio for readability
       const height = Math.min(Math.round(containerWidth * 0.66), Math.max(360, window.innerHeight - 240));
+      const isSingle = viewportWidth < 768;
       return { width: containerWidth, height, isSingle };
     };
 
@@ -38,8 +39,8 @@ const TurnJSBook = ({ pages, currentPage, onPageChange, className }: TurnJSBookP
       height,
       autoCenter: true,
       gradients: true,
-      elevation: 50,
-      duration: 800,
+      elevation: 80,
+      duration: 900,
       page: Math.min(currentPage, pages.length),
       display: isSingle ? "single" : "double",
       when: {
@@ -90,9 +91,9 @@ const TurnJSBook = ({ pages, currentPage, onPageChange, className }: TurnJSBookP
   useLayoutEffect(() => {
     const $: any = (window as any).jQuery || (window as any).$;
     const onResize = () => {
-      if (!initializedRef.current || !bookRef.current || !$) return;
+      const viewportWidth = window.innerWidth;
       const containerWidth = containerRef.current?.clientWidth || 640;
-      const isSingle = containerWidth < 768;
+      const isSingle = viewportWidth < 768;
       const height = Math.min(Math.round(containerWidth * 0.66), Math.max(360, window.innerHeight - 240));
       const $book = $(bookRef.current);
       try {
@@ -111,11 +112,11 @@ const TurnJSBook = ({ pages, currentPage, onPageChange, className }: TurnJSBookP
   return (
     <section className={cn("w-full", className)} aria-label="Interactive story book">
       <div ref={containerRef} className="w-full mx-auto max-w-5xl select-none">
-        <div ref={bookRef} className="shadow-soft ring-1 ring-border rounded-md overflow-hidden bg-card">
+        <div ref={bookRef} className="flipbook relative shadow-soft ring-1 ring-border bg-card">
           {pages.map((page, idx) => (
             <article
               key={idx}
-              className="page h-full w-full bg-card"
+              className={cn("page bg-card", (idx === 0 || idx === pages.length - 1) && "hard")}
               aria-label={`Page ${idx + 1}`}
             >
               <div className="flex flex-col gap-4 p-6 md:p-8">

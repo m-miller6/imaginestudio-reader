@@ -598,3 +598,40 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
     opacity: 1;
   }
 }
+
+/* Turn.js Flipbook polish */
+.flipbook {
+  position: relative;
+  background: hsl(var(--card));
+}
+
+.flipbook .page {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+}
+
+.flipbook .page.hard {
+  background: hsl(var(--muted));
+  box-shadow: inset 0 0 0 2px hsl(var(--border));
+}
+
+.flipbook::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-1px);
+  background: linear-gradient(
+    to right,
+    hsl(var(--foreground) / 0),
+    hsl(var(--foreground) / 0.12),
+    hsl(var(--foreground) / 0)
+  );
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .flipbook::before { display: none; }
+}
