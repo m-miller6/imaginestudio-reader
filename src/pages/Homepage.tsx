@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { useIsMobile } from "@/hooks/use-mobile";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import neverlandCover from "@/assets/trip-to-neverland-cover.jpg";
@@ -36,6 +37,7 @@ const Homepage = () => {
   const [showInteractive, setShowInteractive] = useState(false);
   const [showEducational, setShowEducational] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const isMobile = useIsMobile();
 
   const featuredBooks = [
     {
@@ -151,21 +153,21 @@ const Homepage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={`min-h-screen bg-background ${isMobile ? 'pb-20' : ''}`}>
       <Header />
       <Navigation />
       
       {/* Hero Section with Featured Books */}
-      <section className="p-6 bg-hero-gradient">
+      <section className={`${isMobile ? 'p-4' : 'p-6'} bg-hero-gradient`}>
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-headline font-bold text-center text-primary-foreground mb-8">
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-headline font-bold text-center text-primary-foreground mb-6`}>
             Featured Adventures
           </h2>
           
           <Carousel className="w-full max-w-5xl mx-auto">
             <CarouselContent className="-ml-2 md:-ml-4">
               {featuredBooks.map((book, index) => (
-                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={index} className={`pl-2 md:pl-4 ${isMobile ? 'basis-4/5' : 'md:basis-1/2 lg:basis-1/3'}`}>
                   <Link 
                     to={book.title === "Trip to NeverLand" 
                       ? "/story/neverland" 
@@ -173,21 +175,22 @@ const Homepage = () => {
                       ? "/story/christmas" 
                       : "/create-character"
                     } 
-                    className="block"
+                    className="block tap-highlight-none"
                   >
-                    <Card className="card-magical bg-card/95 backdrop-blur-sm border-2 border-white/20 overflow-hidden">
-                      <div className="aspect-video relative">
+                    <Card className="card-magical bg-card/95 backdrop-blur-sm border-2 border-white/20 overflow-hidden touch-target">
+                      <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-video'} relative`}>
                         <img 
                           src={book.image} 
                           alt={book.title}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         <div className="absolute bottom-4 left-4 text-white">
-                          <h3 className="text-xl font-headline font-bold text-shadow-soft">
+                          <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-headline font-bold text-shadow-soft`}>
                             {book.title}
                           </h3>
-                          <p className="font-playful text-sm">{book.description}</p>
+                          <p className={`font-playful ${isMobile ? 'text-xs' : 'text-sm'}`}>{book.description}</p>
                         </div>
                       </div>
                     </Card>
@@ -195,21 +198,25 @@ const Homepage = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex" />
-            <CarouselNext className="hidden md:flex" />
+            {!isMobile && (
+              <>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+              </>
+            )}
           </Carousel>
         </div>
       </section>
 
       {/* Filters and Search */}
-      <section className="p-6">
+      <section className={`${isMobile ? 'p-4' : 'p-6'} mobile-scroll`}>
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
-            <div className="flex flex-wrap gap-2">
+          <div className={`${isMobile ? 'space-y-4' : 'flex flex-col md:flex-row gap-4 items-center justify-between'} mb-6`}>
+            <div className={`flex ${isMobile ? 'overflow-x-auto mobile-scroll' : 'flex-wrap'} gap-2 ${isMobile ? 'pb-2' : ''}`}>
               <Button 
                 variant={showTopTen ? "default" : "outline"} 
-                size="sm" 
-                className="font-playful"
+                size={isMobile ? "sm" : "sm"} 
+                className={`font-playful touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
                 onClick={() => {
                   setShowTopTen(!showTopTen);
                   setShowInteractive(false);
@@ -221,8 +228,8 @@ const Homepage = () => {
               </Button>
               <Button 
                 variant={showInteractive ? "default" : "outline"} 
-                size="sm" 
-                className="font-playful"
+                size={isMobile ? "sm" : "sm"} 
+                className={`font-playful touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
                 onClick={() => {
                   setShowInteractive(!showInteractive);
                   setShowTopTen(false);
@@ -234,8 +241,8 @@ const Homepage = () => {
               </Button>
               <Button 
                 variant={showEducational ? "default" : "outline"} 
-                size="sm" 
-                className="font-playful"
+                size={isMobile ? "sm" : "sm"} 
+                className={`font-playful touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
                 onClick={() => {
                   setShowEducational(!showEducational);
                   setShowTopTen(false);
@@ -247,13 +254,14 @@ const Homepage = () => {
               </Button>
             </div>
             
-            <div className="relative w-full md:w-80">
+            <div className={`relative ${isMobile ? 'w-full' : 'w-full md:w-80'}`}>
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search stories..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 rounded-xl border-2 border-border focus:border-primary"
+                className={`pl-10 rounded-xl border-2 border-border focus:border-primary touch-target ${isMobile ? 'text-base' : ''}`}
+                inputMode="search"
               />
             </div>
           </div>
@@ -265,29 +273,30 @@ const Homepage = () => {
                 Top 10 Stories
               </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className={`grid ${isMobile ? 'grid-cols-1 gap-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'}`}>
                  {getTopTenStories().map((story, index) => (
                    <Link 
                      key={index} 
                      to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
-                     className="block"
+                     className="block tap-highlight-none"
                    >
-                    <Card className="card-magical bg-card border-2 border-border overflow-hidden">
-                      <div className="aspect-video relative">
+                    <Card className="card-magical bg-card border-2 border-border overflow-hidden touch-target">
+                      <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-video'} relative`}>
                         <img 
                           src={story.image} 
                           alt={story.title}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                        <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground font-bold text-sm px-2 py-1">
+                        <Badge className={`absolute top-2 right-2 bg-primary text-primary-foreground font-bold ${isMobile ? 'text-xs px-1.5 py-0.5' : 'text-sm px-2 py-1'}`}>
                           #{story.ranking}
                         </Badge>
                         <div className="absolute bottom-4 left-4 text-white">
-                          <h4 className="text-lg font-headline font-bold text-shadow-soft">
+                          <h4 className={`${isMobile ? 'text-base' : 'text-lg'} font-headline font-bold text-shadow-soft`}>
                             {story.title}
                           </h4>
-                          <p className="font-playful text-sm">{story.description}</p>
+                          <p className={`font-playful ${isMobile ? 'text-xs' : 'text-sm'}`}>{story.description}</p>
                         </div>
                       </div>
                       

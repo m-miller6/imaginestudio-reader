@@ -4,12 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import { useIsMobile } from "@/hooks/use-mobile";
 import heroIllustration from "@/assets/story-hero-illustration.jpg";
 
 const StoryReader = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showEndModal, setShowEndModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const isMobile = useIsMobile();
 
   const storyPages = [
     {
@@ -52,68 +55,131 @@ const StoryReader = () => {
     }
   };
 
+  // Swipe gesture handlers for mobile
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: nextPage,
+    onSwipeRight: prevPage,
+    threshold: 50
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <Navigation />
       
-      <main className="flex-1 p-4 md:p-6">
+      <main className={`flex-1 p-4 md:p-6 ${isMobile ? 'pb-20' : ''}`}>
         <div className="max-w-6xl mx-auto">
-          {/* Page Navigation */}
-          <div className="flex justify-between items-center mb-6">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prevPage}
-              disabled={currentPage === 1}
-              className="shadow-soft"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            
-            <div className="text-center">
-              <p className="font-playful text-muted-foreground">
+          {/* Mobile Progress Bar */}
+          {isMobile && (
+            <div className="mb-4">
+              <div className="bg-muted rounded-full h-2 overflow-hidden">
+                <div 
+                  className="bg-primary h-full transition-all duration-300 ease-out"
+                  style={{ width: `${(currentPage / totalPages) * 100}%` }}
+                />
+              </div>
+              <p className="text-center text-sm font-playful text-muted-foreground mt-2">
                 Page {currentPage} of {totalPages}
               </p>
             </div>
-            
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextPage}
-              className="shadow-soft"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
+          )}
 
-          {/* Story Content */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-8">
-            {/* Text Column */}
-            <Card className="p-6 md:p-8 shadow-soft border-2 border-border">
-              <div className="prose prose-lg max-w-none">
-                <p className="font-playful text-lg leading-relaxed text-foreground">
-                  {storyPages[currentPage - 1]?.text}
+          {/* Desktop Page Navigation */}
+          {!isMobile && (
+            <div className="flex justify-between items-center mb-6">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={prevPage}
+                disabled={currentPage === 1}
+                className="shadow-soft touch-target"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              
+              <div className="text-center">
+                <p className="font-playful text-muted-foreground">
+                  Page {currentPage} of {totalPages}
                 </p>
               </div>
-            </Card>
+              
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={nextPage}
+                className="shadow-soft touch-target"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
 
-            {/* Illustration Column */}
-            <Card className="overflow-hidden shadow-magical border-2 border-primary/20">
-              <div className="aspect-square relative">
+          {/* Story Content with Swipe Support */}
+          <div 
+            className={`${isMobile ? 'space-y-4' : 'grid lg:grid-cols-2 gap-8'} mb-8 no-select`}
+            {...(isMobile ? swipeHandlers : {})}
+          >
+            {/* Illustration Column - Mobile First */}
+            <Card className={`overflow-hidden shadow-magical border-2 border-primary/20 ${isMobile ? 'order-first' : ''}`}>
+              <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-square'} relative`}>
                 <img 
                   src={storyPages[currentPage - 1]?.illustration}
                   alt="Story illustration"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                
+                {/* Mobile Navigation Overlay */}
+                {isMobile && (
+                  <div className="absolute bottom-4 right-4 flex gap-2">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      onClick={prevPage}
+                      disabled={currentPage === 1}
+                      className="bg-card/90 backdrop-blur touch-target tap-highlight-none"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      onClick={nextPage}
+                      className="bg-card/90 backdrop-blur touch-target tap-highlight-none"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                  </div>
+                )}
               </div>
+            </Card>
+
+            {/* Text Column */}
+            <Card className="p-6 md:p-8 shadow-soft border-2 border-border">
+              <div className="prose prose-lg max-w-none">
+                <p className={`font-playful ${isMobile ? 'text-base' : 'text-lg'} leading-relaxed text-foreground`}>
+                  {storyPages[currentPage - 1]?.text}
+                </p>
+              </div>
+              
+              {/* Mobile Swipe Hint */}
+              {isMobile && currentPage === 1 && (
+                <div className="mt-4 p-3 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground text-center font-playful">
+                    💡 Swipe left/right or use buttons to navigate
+                  </p>
+                </div>
+              )}
             </Card>
           </div>
 
           {/* Save Story Button */}
           <div className="text-center">
-            <Button variant="secondary" size="lg" className="font-playful">
+            <Button 
+              variant="secondary" 
+              size={isMobile ? "default" : "lg"} 
+              className={`font-playful touch-target ${isMobile ? 'w-full' : ''}`}
+            >
               <BookmarkPlus className="h-5 w-5 mr-2" />
               Save Story to Library
             </Button>

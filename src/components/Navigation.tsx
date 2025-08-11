@@ -1,9 +1,14 @@
 import { Library, PlusCircle, Home, Compass } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "./ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navigation = () => {
   const location = useLocation();
+  const isMobile = useIsMobile();
+
+  // Hide desktop navigation on mobile (mobile nav is handled separately)
+  if (isMobile) return null;
 
   return (
     <nav className="w-full bg-card/95 backdrop-blur-sm border-y-2 border-border py-4">
@@ -12,7 +17,7 @@ const Navigation = () => {
           <Button 
             variant={location.pathname === "/" ? "default" : "ghost"} 
             size="lg" 
-            className="flex items-center gap-2 h-12 px-6"
+            className="flex items-center gap-2 h-12 px-6 touch-target"
           >
             <Home className="h-5 w-5" />
             <span className="hidden md:inline">Home</span>
@@ -23,7 +28,7 @@ const Navigation = () => {
           <Button 
             variant={location.pathname === "/explore" ? "default" : "ghost"} 
             size="lg" 
-            className="flex items-center gap-2 h-12 px-6"
+            className="flex items-center gap-2 h-12 px-6 touch-target"
           >
             <Compass className="h-5 w-5" />
             <span className="hidden md:inline">Explore</span>
@@ -34,7 +39,7 @@ const Navigation = () => {
           <Button 
             variant={location.pathname === "/library" ? "default" : "ghost"} 
             size="lg" 
-            className="flex items-center gap-2 h-12 px-6"
+            className="flex items-center gap-2 h-12 px-6 touch-target"
           >
             <Library className="h-5 w-5" />
             <span className="hidden md:inline">Library</span>
@@ -45,7 +50,7 @@ const Navigation = () => {
           <Button 
             variant="adventure" 
             size="lg" 
-            className="flex items-center gap-2 font-playful h-12 px-8"
+            className="flex items-center gap-2 font-playful h-12 px-8 touch-target"
           >
             <PlusCircle className="h-6 w-6" />
             Add Stories
