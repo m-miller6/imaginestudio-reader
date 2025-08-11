@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
-import TurnJSBook from "@/components/TurnJSBook";
+import { PageFlipBook } from "@/components/PageFlipBook";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroIllustration from "@/assets/story-hero-illustration.jpg";
 
@@ -117,7 +117,7 @@ const StoryReader = () => {
 
           {/* Interactive Page Flip Book */}
           <div className="mb-8">
-            <TurnJSBook 
+            <PageFlipBook 
               pages={storyPages}
               currentPage={currentPage}
               onPageChange={handlePageChange}
