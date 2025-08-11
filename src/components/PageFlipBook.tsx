@@ -1,7 +1,5 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { useSwipeGesture } from "@/hooks/useSwipeGesture";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import React, { useRef, useEffect, useState } from 'react';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
 interface PageContent {
   text: string;
@@ -15,247 +13,133 @@ interface PageFlipBookProps {
   className?: string;
 }
 
-export const PageFlipBook = ({ pages, currentPage, onPageChange, className }: PageFlipBookProps) => {
-  const [isFlipping, setIsFlipping] = useState(false);
-  const [flipProgress, setFlipProgress] = useState(0);
-  const [flipDirection, setFlipDirection] = useState<'next' | 'prev'>('next');
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartX, setDragStartX] = useState(0);
-  
+declare global {
+  interface Window {
+    $: any;
+    jQuery: any;
+  }
+}
+
+export const PageFlipBook: React.FC<PageFlipBookProps> = ({
+  pages,
+  currentPage,
+  onPageChange,
+  className = ""
+}) => {
   const bookRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
-  const totalPages = pages.length;
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Handle click to flip
-  const handlePageClick = useCallback((side: 'left' | 'right') => {
-    if (isFlipping || isDragging) return;
-    
-    if (side === 'right' && currentPage < totalPages) {
-      setFlipDirection('next');
-      setIsFlipping(true);
-      setTimeout(() => {
-        onPageChange(currentPage + 1);
-        setIsFlipping(false);
-        setFlipProgress(0);
-      }, 750);
-    } else if (side === 'left' && currentPage > 1) {
-      setFlipDirection('prev');
-      setIsFlipping(true);
-      setTimeout(() => {
-        onPageChange(currentPage - 1);
-        setIsFlipping(false);
-        setFlipProgress(0);
-      }, 750);
-    }
-  }, [currentPage, totalPages, onPageChange, isFlipping, isDragging]);
+  useEffect(() => {
+    const book = bookRef.current;
+    if (!book || !window.$ || isInitialized) return;
 
-  // Handle drag start
-  const handleDragStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (isFlipping) return;
-    
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    setIsDragging(true);
-    setDragStartX(clientX);
-    setFlipProgress(0);
-  }, [isFlipping]);
-
-  // Handle drag move
-  const handleDragMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    if (!isDragging || !bookRef.current) return;
-    
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
-    const bookRect = bookRef.current.getBoundingClientRect();
-    const bookCenter = bookRect.left + bookRect.width / 2;
-    const dragDistance = clientX - dragStartX;
-    const maxDrag = bookRect.width / 3;
-    
-    // Determine flip direction based on start position and drag direction
-    const startedOnRightSide = dragStartX > bookCenter;
-    
-    if (startedOnRightSide && dragDistance < 0 && currentPage < totalPages) {
-      // Dragging left from right side - next page
-      setFlipDirection('next');
-      const progress = Math.min(Math.abs(dragDistance) / maxDrag, 1);
-      setFlipProgress(progress);
-    } else if (!startedOnRightSide && dragDistance > 0 && currentPage > 1) {
-      // Dragging right from left side - previous page
-      setFlipDirection('prev');
-      const progress = Math.min(dragDistance / maxDrag, 1);
-      setFlipProgress(progress);
-    } else {
-      setFlipProgress(0);
-    }
-  }, [isDragging, dragStartX, currentPage, totalPages]);
-
-  // Handle drag end
-  const handleDragEnd = useCallback(() => {
-    if (!isDragging) return;
-    
-    setIsDragging(false);
-    
-    if (flipProgress > 0.3) {
-      // Complete the flip
-      setIsFlipping(true);
-      setTimeout(() => {
-        if (flipDirection === 'next' && currentPage < totalPages) {
-          onPageChange(currentPage + 1);
-        } else if (flipDirection === 'prev' && currentPage > 1) {
-          onPageChange(currentPage - 1);
+    // Initialize turn.js
+    const $book = window.$(book);
+    $book.turn({
+      width: 800,
+      height: 600,
+      elevation: 50,
+      gradients: true,
+      autoCenter: true,
+      duration: 1000,
+      pages: pages.length,
+      page: currentPage,
+      when: {
+        turning: function(event: any, page: number) {
+          onPageChange(page);
+        },
+        turned: function(event: any, page: number) {
+          onPageChange(page);
         }
-        setIsFlipping(false);
-        setFlipProgress(0);
-      }, 400);
-    } else {
-      // Snap back
-      setFlipProgress(0);
-    }
-  }, [isDragging, flipProgress, flipDirection, currentPage, totalPages, onPageChange]);
+      }
+    });
 
-  // Swipe gesture handlers for mobile
+    setIsInitialized(true);
+
+    return () => {
+      if (window.$ && $book.turn('is')) {
+        $book.turn('destroy');
+      }
+    };
+  }, [pages.length, isInitialized]);
+
+  // Update page when currentPage prop changes
+  useEffect(() => {
+    const book = bookRef.current;
+    if (!book || !window.$ || !isInitialized) return;
+
+    const $book = window.$(book);
+    if ($book.turn('is') && $book.turn('page') !== currentPage) {
+      $book.turn('page', currentPage);
+    }
+  }, [currentPage, isInitialized]);
+
+  // Fallback swipe gestures for mobile devices
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => handlePageClick('right'),
-    onSwipeRight: () => handlePageClick('left'),
-    threshold: 50
+    onSwipeLeft: () => {
+      if (window.$ && bookRef.current) {
+        const $book = window.$(bookRef.current);
+        if ($book.turn('is')) {
+          $book.turn('next');
+        }
+      }
+    },
+    onSwipeRight: () => {
+      if (window.$ && bookRef.current) {
+        const $book = window.$(bookRef.current);
+        if ($book.turn('is')) {
+          $book.turn('previous');
+        }
+      }
+    }
   });
 
-  // Get current and next/prev page content
-  const currentPageContent = pages[currentPage - 1];
-  const nextPageContent = pages[currentPage];
-  const prevPageContent = pages[currentPage - 2];
-  
-  const previewContent = flipDirection === 'next' ? nextPageContent : prevPageContent;
-
-  // Calculate flip rotation based on progress or animation
-  const getFlipRotation = () => {
-    if (isDragging) {
-      // Flip towards reader (negative rotation for right page)
-      return flipDirection === 'next' ? -flipProgress * 180 : flipProgress * 180;
-    }
-    if (isFlipping) {
-      // Complete flip towards reader
-      return flipDirection === 'next' ? -180 : 180;
-    }
-    return 0;
-  };
-
-  const flipRotation = getFlipRotation();
-  const curlIntensity = Math.min(Math.abs(flipRotation) / 180, 1);
+  if (!pages || pages.length === 0) {
+    return (
+      <div className={`book-container ${className}`}>
+        <div className="flex items-center justify-center h-full text-muted-foreground">
+          No pages to display
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div 
-      ref={bookRef}
-      className={cn("book-container", className)}
-      {...(isMobile ? swipeHandlers : {})}
-    >
-      {/* Book Spine */}
-      <div className="book-spine" />
-      
-      {/* Left Page */}
+    <div className={`book-container ${className}`} {...swipeHandlers}>
       <div 
-        className="book-page book-page-left"
-        onClick={() => handlePageClick('left')}
-        onMouseDown={handleDragStart}
-        onMouseMove={handleDragMove}
-        onMouseUp={handleDragEnd}
-        onTouchStart={handleDragStart}
-        onTouchMove={handleDragMove}
-        onTouchEnd={handleDragEnd}
-      >
-        {/* Page content - text side */}
-        <div className="page-content page-text">
-          <div className="prose prose-lg max-w-none p-6 md:p-8">
-            <p className={`font-playful ${isMobile ? 'text-base' : 'text-lg'} leading-relaxed text-foreground`}>
-              {currentPageContent?.text}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Page */}
-      <div 
-        className={cn(
-          "book-page book-page-right",
-          (isFlipping || isDragging) && "flipping"
-        )}
+        ref={bookRef}
+        className="turn-js-book"
         style={{
-          '--flip-rotation': `${flipRotation}deg`,
-          '--curl-intensity': curlIntensity,
-          '--shadow-opacity': curlIntensity * 0.6,
-        } as React.CSSProperties}
-        onClick={() => handlePageClick('right')}
-        onMouseDown={handleDragStart}
-        onMouseMove={handleDragMove}
-        onMouseUp={handleDragEnd}
-        onTouchStart={handleDragStart}
-        onTouchMove={handleDragMove}
-        onTouchEnd={handleDragEnd}
+          width: '800px',
+          height: '600px',
+          margin: '0 auto'
+        }}
       >
-        {/* Front face - illustration */}
-        <div className="page-face page-face-front">
-          <div className="page-content page-illustration">
-            <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-square'} relative`}>
-              <img 
-                src={currentPageContent?.illustration}
-                alt="Story illustration"
-                className="w-full h-full object-cover"
-              />
-              <div className="page-gradient" />
-            </div>
-          </div>
-        </div>
-
-        {/* Back face - preview of next/previous page */}
-        {previewContent && (
-          <div className="page-face page-face-back">
-            <div className="page-content page-preview">
-              {flipDirection === 'next' ? (
-                <div className="prose prose-lg max-w-none p-6 md:p-8">
-                  <p className={`font-playful ${isMobile ? 'text-base' : 'text-lg'} leading-relaxed text-foreground opacity-80`}>
-                    {previewContent.text}
-                  </p>
-                </div>
-              ) : (
-                <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-square'} relative`}>
+        {pages.map((page, index) => (
+          <div key={index + 1} className="turn-page">
+            <div className="page-content">
+              {page.illustration && (
+                <div className="page-illustration">
                   <img 
-                    src={previewContent.illustration}
-                    alt="Previous page illustration"
-                    className="w-full h-full object-cover opacity-80"
+                    src={page.illustration} 
+                    alt={`Story illustration ${index + 1}`}
+                    className="w-full h-auto object-contain"
                   />
-                  <div className="page-gradient" />
                 </div>
               )}
+              {page.text && (
+                <div className="page-text">
+                  <p className="text-lg leading-relaxed text-foreground">
+                    {page.text}
+                  </p>
+                </div>
+              )}
+              <div className="page-number">
+                {index + 1}
+              </div>
             </div>
           </div>
-        )}
-
-        {/* Page curl shadow and lighting effects */}
-        <div 
-          className="page-curl-shadow"
-          style={{
-            '--shadow-opacity': curlIntensity * 0.8,
-          } as React.CSSProperties}
-        />
-        <div 
-          className="page-curl-highlight"
-          style={{
-            '--highlight-opacity': curlIntensity * 0.4,
-          } as React.CSSProperties}
-        />
-        
-        {/* Dynamic drop shadow */}
-        <div 
-          className="page-drop-shadow"
-          style={{
-            '--drop-shadow-opacity': curlIntensity * 0.5,
-            '--drop-shadow-blur': `${curlIntensity * 20}px`,
-          } as React.CSSProperties}
-        />
-      </div>
-
-      {/* Page number indicators */}
-      <div className="page-numbers">
-        <span className="page-number page-number-left">{currentPage * 2 - 1}</span>
-        <span className="page-number page-number-right">{currentPage * 2}</span>
+        ))}
       </div>
     </div>
   );
