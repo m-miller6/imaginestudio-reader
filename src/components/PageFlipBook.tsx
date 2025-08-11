@@ -45,7 +45,7 @@ export const PageFlipBook: React.FC<PageFlipBookProps> = ({
         // Initialize turn.js with jQuery
         const $book = window.$(book);
         $book.turn({
-          width: 800,
+          width: 1000,
           height: 600,
           elevation: 50,
           gradients: true,
@@ -133,22 +133,16 @@ export const PageFlipBook: React.FC<PageFlipBookProps> = ({
     <div className={`book-container ${className}`} {...swipeHandlers}>
       <div 
         ref={bookRef}
-        className="turn-js-book"
-        style={{
-          width: '800px',
-          height: '600px',
-          margin: '0 auto'
-        }}
+        className="flipbook"
       >
         {pages.map((page, index) => (
-          <div key={index + 1} className="turn-page">
+          <div key={index + 1} className={index === 0 || index === pages.length - 1 ? "page hard" : "page"}>
             <div className="page-content">
               {page.illustration && (
                 <div className="page-illustration">
                   <img 
                     src={page.illustration} 
                     alt={`Story illustration ${index + 1}`}
-                    className="w-full h-auto object-contain"
                   />
                 </div>
               )}
