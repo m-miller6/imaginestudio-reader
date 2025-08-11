@@ -31,34 +31,84 @@ export const PageFlipBook: React.FC<PageFlipBookProps> = ({
 
   useEffect(() => {
     const book = bookRef.current;
-    if (!book || !window.$ || isInitialized) return;
+    if (!book || isInitialized) return;
 
-    // Initialize turn.js
-    const $book = window.$(book);
-    $book.turn({
-      width: 800,
-      height: 600,
-      elevation: 50,
-      gradients: true,
-      autoCenter: true,
-      duration: 1000,
-      pages: pages.length,
-      page: currentPage,
-      when: {
-        turning: function(event: any, page: number) {
-          onPageChange(page);
-        },
-        turned: function(event: any, page: number) {
-          onPageChange(page);
-        }
+    // Wait for scripts to load and check if turn.js is available
+    const checkAndInitialize = () => {
+      if (!window.$ || !window.jQuery) {
+        console.log('jQuery not loaded yet');
+        return false;
       }
-    });
 
-    setIsInitialized(true);
+      // Check if turn plugin is available
+      if (typeof window.$.fn.turn !== 'function') {
+        console.log('Turn.js plugin not loaded yet');
+        return false;
+      }
+
+      try {
+        // Initialize turn.js
+        const $book = window.$(book);
+        $book.turn({
+          width: 800,
+          height: 600,
+          elevation: 50,
+          gradients: true,
+          autoCenter: true,
+          duration: 1000,
+          pages: pages.length,
+          page: currentPage,
+          when: {
+            turning: function(event: any, page: number) {
+              onPageChange(page);
+            },
+            turned: function(event: any, page: number) {
+              onPageChange(page);
+            }
+          }
+        });
+
+        setIsInitialized(true);
+        console.log('Turn.js initialized successfully');
+        return true;
+      } catch (error) {
+        console.error('Error initializing turn.js:', error);
+        return false;
+      }
+    };
+
+    // Try to initialize immediately
+    if (checkAndInitialize()) {
+      return;
+    }
+
+    // If not ready, wait for scripts to load
+    const interval = setInterval(() => {
+      if (checkAndInitialize()) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    // Cleanup interval after 10 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      console.error('Turn.js failed to load within 10 seconds');
+    }, 10000);
 
     return () => {
-      if (window.$ && $book.turn('is')) {
-        $book.turn('destroy');
+      clearInterval(interval);
+      clearTimeout(timeout);
+      if (window.$ && bookRef.current) {
+        const $book = window.$(bookRef.current);
+        if ($book.turn && typeof $book.turn === 'function') {
+          try {
+            if ($book.turn('is')) {
+              $book.turn('destroy');
+            }
+          } catch (e) {
+            console.log('Error destroying turn.js:', e);
+          }
+        }
       }
     };
   }, [pages.length, isInitialized]);
