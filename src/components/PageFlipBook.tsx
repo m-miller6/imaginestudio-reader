@@ -128,15 +128,18 @@ export const PageFlipBook = ({ pages, currentPage, onPageChange, className }: Pa
   // Calculate flip rotation based on progress or animation
   const getFlipRotation = () => {
     if (isDragging) {
-      return flipProgress * 180;
+      // Flip towards reader (negative rotation for right page)
+      return flipDirection === 'next' ? -flipProgress * 180 : flipProgress * 180;
     }
     if (isFlipping) {
-      return 180;
+      // Complete flip towards reader
+      return flipDirection === 'next' ? -180 : 180;
     }
     return 0;
   };
 
   const flipRotation = getFlipRotation();
+  const curlIntensity = Math.min(Math.abs(flipRotation) / 180, 1);
 
   return (
     <div 
@@ -176,6 +179,8 @@ export const PageFlipBook = ({ pages, currentPage, onPageChange, className }: Pa
         )}
         style={{
           '--flip-rotation': `${flipRotation}deg`,
+          '--curl-intensity': curlIntensity,
+          '--shadow-opacity': curlIntensity * 0.6,
         } as React.CSSProperties}
         onClick={() => handlePageClick('right')}
         onMouseDown={handleDragStart}
@@ -223,8 +228,28 @@ export const PageFlipBook = ({ pages, currentPage, onPageChange, className }: Pa
           </div>
         )}
 
-        {/* Page curl shadow */}
-        <div className="page-curl-shadow" />
+        {/* Page curl shadow and lighting effects */}
+        <div 
+          className="page-curl-shadow"
+          style={{
+            '--shadow-opacity': curlIntensity * 0.8,
+          } as React.CSSProperties}
+        />
+        <div 
+          className="page-curl-highlight"
+          style={{
+            '--highlight-opacity': curlIntensity * 0.4,
+          } as React.CSSProperties}
+        />
+        
+        {/* Dynamic drop shadow */}
+        <div 
+          className="page-drop-shadow"
+          style={{
+            '--drop-shadow-opacity': curlIntensity * 0.5,
+            '--drop-shadow-blur': `${curlIntensity * 20}px`,
+          } as React.CSSProperties}
+        />
       </div>
 
       {/* Page number indicators */}

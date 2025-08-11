@@ -329,7 +329,12 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
 }
 
 .book-page-right.flipping {
-  transform: rotateY(var(--flip-rotation, 0deg));
+  transform: 
+    rotateY(var(--flip-rotation, 0deg))
+    perspective(800px)
+    rotateX(calc(var(--curl-intensity, 0) * -15deg));
+  filter: 
+    drop-shadow(calc(var(--curl-intensity, 0) * -10px) calc(var(--curl-intensity, 0) * 15px) calc(var(--curl-intensity, 0) * 20px) hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.3)));
 }
 
 .page-face {
@@ -391,18 +396,42 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
 }
 
 .page-curl-shadow {
-  @apply absolute inset-0 pointer-events-none opacity-0;
+  @apply absolute inset-0 pointer-events-none;
   background: linear-gradient(
-    45deg,
-    transparent 30%,
-    hsl(var(--foreground) / 0.2) 50%,
-    transparent 70%
+    105deg,
+    transparent 40%,
+    hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.4)) 50%,
+    hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.8)) 52%,
+    transparent 60%
   );
-  transition: opacity 0.3s ease-out;
+  opacity: var(--shadow-opacity, 0);
+  transition: opacity 0.2s ease-out;
+  mix-blend-mode: multiply;
 }
 
-.book-page-right.flipping .page-curl-shadow {
-  opacity: 1;
+.page-curl-highlight {
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(
+    75deg,
+    transparent 30%,
+    hsl(var(--background)) 45%,
+    hsl(var(--card)) 50%,
+    transparent 65%
+  );
+  opacity: var(--highlight-opacity, 0);
+  transition: opacity 0.2s ease-out;
+  mix-blend-mode: overlay;
+}
+
+.page-drop-shadow {
+  @apply absolute inset-0 pointer-events-none;
+  background: transparent;
+  box-shadow: 
+    calc(var(--curl-intensity, 0) * -8px) 
+    calc(var(--curl-intensity, 0) * 12px) 
+    var(--drop-shadow-blur, 0px) 
+    hsl(var(--foreground) / var(--drop-shadow-opacity, 0));
+  transition: all 0.2s ease-out;
 }
 
 .page-numbers {
@@ -417,7 +446,7 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
 
 /* Hover effects */
 .book-page:hover .page-content {
-  transform: translateY(-2px);
+  transform: translateY(-2px) perspective(800px) rotateX(-2deg);
   box-shadow: 
     0 15px 40px -5px hsl(var(--foreground) / 0.2),
     0 0 0 1px hsl(var(--primary) / 0.3),
@@ -425,7 +454,11 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
 }
 
 .book-page:hover .page-curl-shadow {
-  opacity: 0.3;
+  opacity: 0.2;
+}
+
+.book-page:hover .page-curl-highlight {
+  opacity: 0.1;
 }
 
 /* Mobile responsiveness */
