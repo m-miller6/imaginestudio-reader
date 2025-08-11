@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
-import { useSwipeGesture } from "@/hooks/useSwipeGesture";
+import { PageFlipBook } from "@/components/PageFlipBook";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroIllustration from "@/assets/story-hero-illustration.jpg";
 
@@ -31,6 +31,14 @@ const StoryReader = () => {
 
   const totalPages = storyPages.length;
 
+  const handlePageChange = (page: number) => {
+    if (page > totalPages) {
+      setShowEndModal(true);
+    } else {
+      setCurrentPage(page);
+    }
+  };
+
   const nextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -54,13 +62,6 @@ const StoryReader = () => {
       // Navigate back to homepage
     }
   };
-
-  // Swipe gesture handlers for mobile
-  const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: nextPage,
-    onSwipeRight: prevPage,
-    threshold: 50
-  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,63 +115,23 @@ const StoryReader = () => {
             </div>
           )}
 
-          {/* Story Content with Swipe Support */}
-          <div 
-            className={`${isMobile ? 'space-y-4' : 'grid lg:grid-cols-2 gap-8'} mb-8 no-select`}
-            {...(isMobile ? swipeHandlers : {})}
-          >
-            {/* Illustration Column - Mobile First */}
-            <Card className={`overflow-hidden shadow-magical border-2 border-primary/20 ${isMobile ? 'order-first' : ''}`}>
-              <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-square'} relative`}>
-                <img 
-                  src={storyPages[currentPage - 1]?.illustration}
-                  alt="Story illustration"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                
-                {/* Mobile Navigation Overlay */}
-                {isMobile && (
-                  <div className="absolute bottom-4 right-4 flex gap-2">
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      onClick={prevPage}
-                      disabled={currentPage === 1}
-                      className="bg-card/90 backdrop-blur touch-target tap-highlight-none"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      onClick={nextPage}
-                      className="bg-card/90 backdrop-blur touch-target tap-highlight-none"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {/* Text Column */}
-            <Card className="p-6 md:p-8 shadow-soft border-2 border-border">
-              <div className="prose prose-lg max-w-none">
-                <p className={`font-playful ${isMobile ? 'text-base' : 'text-lg'} leading-relaxed text-foreground`}>
-                  {storyPages[currentPage - 1]?.text}
+          {/* Interactive Page Flip Book */}
+          <div className="mb-8">
+            <PageFlipBook 
+              pages={storyPages}
+              currentPage={currentPage}
+              onPageChange={handlePageChange}
+              className="no-select"
+            />
+            
+            {/* Mobile Hint */}
+            {isMobile && currentPage === 1 && (
+              <div className="mt-4 p-3 bg-muted rounded-lg">
+                <p className="text-sm text-muted-foreground text-center font-playful">
+                  📖 Click pages to flip or drag to turn them slowly
                 </p>
               </div>
-              
-              {/* Mobile Swipe Hint */}
-              {isMobile && currentPage === 1 && (
-                <div className="mt-4 p-3 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground text-center font-playful">
-                    💡 Swipe left/right or use buttons to navigate
-                  </p>
-                </div>
-              )}
-            </Card>
+            )}
           </div>
 
           {/* Save Story Button */}

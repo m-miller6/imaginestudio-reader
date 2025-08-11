@@ -281,6 +281,168 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
   }
 }
 
+/* Book & Page Flip Animations */
+.book-container {
+  @apply relative mx-auto;
+  width: 100%;
+  max-width: 800px;
+  height: 600px;
+  perspective: 1500px;
+  transform-style: preserve-3d;
+}
+
+.book-spine {
+  @apply absolute top-0 left-1/2 transform -translate-x-1/2;
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    hsl(var(--muted-foreground)),
+    hsl(var(--foreground)),
+    hsl(var(--muted-foreground))
+  );
+  border-radius: 4px;
+  box-shadow: 
+    0 0 10px hsl(var(--foreground) / 0.3),
+    inset 0 0 5px hsl(var(--background) / 0.5);
+  z-index: 100;
+}
+
+.book-page {
+  @apply absolute top-0 cursor-pointer;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  transition: all 0.1s ease-out;
+}
+
+.book-page-left {
+  @apply left-0;
+  transform-origin: right center;
+}
+
+.book-page-right {
+  @apply right-0;
+  transform-origin: left center;
+  transition: transform 0.75s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.book-page-right.flipping {
+  transform: rotateY(var(--flip-rotation, 0deg));
+}
+
+.page-face {
+  @apply absolute inset-0 w-full h-full;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+
+.page-face-front {
+  transform: rotateY(0deg);
+}
+
+.page-face-back {
+  transform: rotateY(180deg);
+}
+
+.page-content {
+  @apply w-full h-full relative overflow-hidden;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--card)),
+    hsl(var(--card)) 85%,
+    hsl(var(--muted)) 100%
+  );
+  border: 2px solid hsl(var(--border));
+  border-radius: 8px;
+  box-shadow: 
+    0 10px 30px -5px hsl(var(--foreground) / 0.15),
+    0 0 0 1px hsl(var(--border)),
+    inset 0 1px 0 hsl(var(--background) / 0.5);
+}
+
+.page-text {
+  @apply flex items-center justify-center;
+}
+
+.page-illustration {
+  @apply p-4;
+}
+
+.page-preview {
+  @apply flex items-center justify-center;
+  background: linear-gradient(
+    135deg,
+    hsl(var(--muted)),
+    hsl(var(--muted)) 85%,
+    hsl(var(--card)) 100%
+  );
+}
+
+.page-gradient {
+  @apply absolute inset-0 pointer-events-none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 60%,
+    hsl(var(--foreground) / 0.1) 100%
+  );
+}
+
+.page-curl-shadow {
+  @apply absolute inset-0 pointer-events-none opacity-0;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    hsl(var(--foreground) / 0.2) 50%,
+    transparent 70%
+  );
+  transition: opacity 0.3s ease-out;
+}
+
+.book-page-right.flipping .page-curl-shadow {
+  opacity: 1;
+}
+
+.page-numbers {
+  @apply absolute bottom-4 left-0 right-0 flex justify-between px-8;
+  z-index: 50;
+}
+
+.page-number {
+  @apply text-sm font-playful text-muted-foreground;
+  text-shadow: 0 1px 2px hsl(var(--background));
+}
+
+/* Hover effects */
+.book-page:hover .page-content {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 40px -5px hsl(var(--foreground) / 0.2),
+    0 0 0 1px hsl(var(--primary) / 0.3),
+    inset 0 1px 0 hsl(var(--background) / 0.7);
+}
+
+.book-page:hover .page-curl-shadow {
+  opacity: 0.3;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .book-container {
+    height: 500px;
+  }
+  
+  .page-content {
+    border-radius: 6px;
+  }
+  
+  .page-numbers {
+    @apply bottom-2 px-4;
+  }
+}
+
 @layer utilities {
   .text-shadow-soft {
     text-shadow: 0 2px 4px hsl(0 0% 0% / 0.1);
@@ -301,11 +463,13 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
   /* Mobile-first utilities */
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
+    touch-action: manipulation;
   }
 
   .mobile-scroll {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    overscroll-behavior: contain;
   }
 
   .safe-area-top {
@@ -322,6 +486,10 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
 
   .safe-area-right {
     padding-right: env(safe-area-inset-right);
+  }
+
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
   }
 
   /* Prevent text selection on touch devices */
