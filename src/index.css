@@ -353,18 +353,14 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
 
 .page-content {
   @apply w-full h-full relative overflow-hidden;
-  background: linear-gradient(
-    135deg,
-    hsl(var(--card)),
-    hsl(var(--card)) 85%,
-    hsl(var(--muted)) 100%
-  );
+  background: hsl(var(--card));
   border: 2px solid hsl(var(--border));
   border-radius: 8px;
   box-shadow: 
     0 10px 30px -5px hsl(var(--foreground) / 0.15),
     0 0 0 1px hsl(var(--border)),
     inset 0 1px 0 hsl(var(--background) / 0.5);
+  opacity: 1;
 }
 
 .page-text {
@@ -400,13 +396,12 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
   background: linear-gradient(
     105deg,
     transparent 40%,
-    hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.4)) 50%,
-    hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.8)) 52%,
+    hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.3)) 50%,
+    hsl(var(--foreground) / calc(var(--shadow-opacity, 0) * 0.6)) 52%,
     transparent 60%
   );
   opacity: var(--shadow-opacity, 0);
   transition: opacity 0.2s ease-out;
-  mix-blend-mode: multiply;
 }
 
 .page-curl-highlight {
@@ -414,13 +409,12 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
   background: linear-gradient(
     75deg,
     transparent 30%,
-    hsl(var(--background)) 45%,
-    hsl(var(--card)) 50%,
+    hsl(var(--background) / 0.3) 45%,
+    hsl(var(--card) / 0.2) 50%,
     transparent 65%
   );
   opacity: var(--highlight-opacity, 0);
   transition: opacity 0.2s ease-out;
-  mix-blend-mode: overlay;
 }
 
 .page-drop-shadow {
@@ -453,12 +447,13 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
     inset 0 1px 0 hsl(var(--background) / 0.7);
 }
 
-.book-page:hover .page-curl-shadow {
-  opacity: 0.2;
-}
-
-.book-page:hover .page-curl-highlight {
-  opacity: 0.1;
+/* Prevent hover effects during flipping */
+.book-page.flipping:hover .page-content {
+  transform: none;
+  box-shadow: 
+    0 10px 30px -5px hsl(var(--foreground) / 0.15),
+    0 0 0 1px hsl(var(--border)),
+    inset 0 1px 0 hsl(var(--background) / 0.5);
 }
 
 /* Mobile responsiveness */
