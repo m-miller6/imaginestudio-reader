@@ -172,14 +172,14 @@ const Header = () => {
                 </DialogContent>
               </Dialog>
               
-              <Link to="/profile">
+              <Link to="/signup">
                 <Button 
                   variant="default" 
                   size="sm" 
                   className="flex items-center gap-2"
                 >
                   <User className="h-4 w-4" />
-                  <span className="hidden md:inline">Profile</span>
+                  <span className="hidden md:inline">Sign Up</span>
                 </Button>
               </Link>
             </>
