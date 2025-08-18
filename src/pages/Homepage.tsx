@@ -157,10 +157,17 @@ const Homepage = () => {
       <Header />
       <Navigation />
       
-      {/* Hero Section with Featured Books */}
-      <section className={`${isMobile ? 'p-4' : 'p-6'} bg-hero-gradient`}>
-        <div className="max-w-6xl mx-auto">
-          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-headline font-bold text-center text-primary-foreground mb-6`}>
+      {/* Hero Section - Montessori inspired */}
+      <section className={`${isMobile ? 'p-4 py-8' : 'p-6 py-12'} bg-hero-montessori`}>
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className={`${isMobile ? 'text-2xl' : 'text-4xl md:text-5xl'} font-headline font-bold text-white mb-4`}>
+            A playroom of possibilities
+          </h1>
+          <p className={`${isMobile ? 'text-sm' : 'text-lg md:text-xl'} text-white/90 mb-8 max-w-2xl mx-auto font-body`}>
+            Where curious minds explore endless adventures through personalized stories
+          </p>
+          
+          <h2 className={`${isMobile ? 'text-lg' : 'text-xl md:text-2xl'} font-headline font-semibold text-white mb-6`}>
             Featured Adventures
           </h2>
           
@@ -177,7 +184,7 @@ const Homepage = () => {
                     } 
                     className="block tap-highlight-none"
                   >
-                    <Card className="card-magical bg-card/95 backdrop-blur-sm border-2 border-white/20 overflow-hidden touch-target">
+                    <Card className="card-montessori bg-card/95 backdrop-blur-sm border border-white/30 overflow-hidden touch-target">
                       <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-video'} relative`}>
                         <img 
                           src={book.image} 
@@ -187,10 +194,10 @@ const Homepage = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         <div className="absolute bottom-4 left-4 text-white">
-                          <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-headline font-bold text-shadow-soft`}>
+                          <h3 className={`${isMobile ? 'text-lg' : 'text-xl'} font-headline font-semibold`}>
                             {book.title}
                           </h3>
-                          <p className={`font-playful ${isMobile ? 'text-xs' : 'text-sm'}`}>{book.description}</p>
+                          <p className={`font-body ${isMobile ? 'text-xs' : 'text-sm'} opacity-90`}>{book.description}</p>
                         </div>
                       </div>
                     </Card>
@@ -208,15 +215,18 @@ const Homepage = () => {
         </div>
       </section>
 
+      {/* Organic section divider */}
+      <div className="section-divider"></div>
+
       {/* Filters and Search */}
-      <section className={`${isMobile ? 'p-4' : 'p-6'} mobile-scroll`}>
+      <section className={`${isMobile ? 'p-4' : 'p-6'} mobile-scroll bg-calm-section`}>
         <div className="max-w-6xl mx-auto">
-          <div className={`${isMobile ? 'space-y-4' : 'flex flex-col md:flex-row gap-4 items-center justify-between'} mb-6`}>
-            <div className={`flex ${isMobile ? 'overflow-x-auto mobile-scroll' : 'flex-wrap'} gap-2 ${isMobile ? 'pb-2' : ''}`}>
+          <div className={`${isMobile ? 'space-y-4' : 'flex flex-col md:flex-row gap-4 items-center justify-between'} mb-8`}>
+            <div className={`flex ${isMobile ? 'overflow-x-auto mobile-scroll' : 'flex-wrap'} gap-3 ${isMobile ? 'pb-2' : ''}`}>
               <Button 
                 variant={showTopTen ? "default" : "outline"} 
-                size={isMobile ? "sm" : "sm"} 
-                className={`font-playful touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
+                size={isMobile ? "sm" : "default"} 
+                className={`font-body touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
                 onClick={() => {
                   setShowTopTen(!showTopTen);
                   setShowInteractive(false);
@@ -224,12 +234,12 @@ const Homepage = () => {
                 }}
               >
                 <Star className="h-4 w-4 mr-1" />
-                Top 10
+                Top Stories
               </Button>
               <Button 
                 variant={showInteractive ? "default" : "outline"} 
-                size={isMobile ? "sm" : "sm"} 
-                className={`font-playful touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
+                size={isMobile ? "sm" : "default"} 
+                className={`font-body touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
                 onClick={() => {
                   setShowInteractive(!showInteractive);
                   setShowTopTen(false);
@@ -241,8 +251,8 @@ const Homepage = () => {
               </Button>
               <Button 
                 variant={showEducational ? "default" : "outline"} 
-                size={isMobile ? "sm" : "sm"} 
-                className={`font-playful touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
+                size={isMobile ? "sm" : "default"} 
+                className={`font-body touch-target ${isMobile ? 'flex-shrink-0' : ''}`}
                 onClick={() => {
                   setShowEducational(!showEducational);
                   setShowTopTen(false);
@@ -255,12 +265,12 @@ const Homepage = () => {
             </div>
             
             <div className={`relative ${isMobile ? 'w-full' : 'w-full md:w-80'}`}>
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Search stories..."
+                placeholder="Discover your next adventure..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className={`pl-10 rounded-xl border-2 border-border focus:border-primary touch-target ${isMobile ? 'text-base' : ''}`}
+                className={`pl-12 pr-4 rounded-2xl border border-border/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 touch-target shadow-gentle ${isMobile ? 'text-base h-12' : 'h-11'} bg-card`}
                 inputMode="search"
               />
             </div>
@@ -280,7 +290,7 @@ const Homepage = () => {
                      to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
                      className="block tap-highlight-none"
                    >
-                    <Card className="card-magical bg-card border-2 border-border overflow-hidden touch-target">
+                    <Card className="card-montessori overflow-hidden touch-target">
                       <div className={`${isMobile ? 'aspect-[4/3]' : 'aspect-video'} relative`}>
                         <img 
                           src={story.image} 
@@ -337,7 +347,7 @@ const Homepage = () => {
                              to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
                              className="block"
                            >
-                            <Card className="card-magical bg-card border-2 border-border overflow-hidden">
+                             <Card className="card-interactive overflow-hidden">
                               <div className="aspect-video relative">
                                 <img 
                                   src={story.image} 

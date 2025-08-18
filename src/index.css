@@ -2,65 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Imagine Studios Design System - Whimsical & Child-Friendly
-All colors MUST be HSL. Pastel blues, greens, and yellows.
+/* Montessori-Inspired Design System - Calm, Friendly & Educational
+Colors: Soft pastels, warm neutrals, with tasteful accent pops
+Typography: Rounded, approachable fonts for warmth and friendliness
 */
 
 @layer base {
   :root {
-    /* Main background - soft cream */
-    --background: 48 100% 97%;
-    --foreground: 223 47% 23%;
+    /* Warm neutral backgrounds - inspired by natural materials */
+    --background: 45 30% 96%;         /* soft warm white/cream */
+    --foreground: 210 15% 25%;        /* charcoal gray for readability */
 
-    /* Card backgrounds - pure white with subtle warmth */
-    --card: 0 0% 100%;
-    --card-foreground: 223 47% 23%;
+    /* Card backgrounds - clean and warm */
+    --card: 0 0% 100%;                /* pure white cards */
+    --card-foreground: 210 15% 25%;
 
     /* Popover styling */
     --popover: 0 0% 100%;
-    --popover-foreground: 223 47% 23%;
+    --popover-foreground: 210 15% 25%;
 
-    /* Primary - Whimsical Blue */
-    --primary: 210 100% 75%;
+    /* Primary - soft friendly blue (Pok Pok inspired) */
+    --primary: 195 85% 65%;           /* calm, trustworthy blue */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 210 100% 70%;
+    --primary-hover: 195 85% 58%;
 
-    /* Secondary - Soft Green */
-    --secondary: 120 60% 85%;
-    --secondary-foreground: 120 30% 25%;
-    --secondary-hover: 120 60% 80%;
+    /* Secondary - warm beige/neutral */
+    --secondary: 35 20% 92%;          /* soft beige for sections */
+    --secondary-foreground: 210 15% 35%;
+    --secondary-hover: 35 20% 88%;
 
-    /* Accent - Gentle Yellow */
-    --accent: 50 100% 85%;
-    --accent-foreground: 45 60% 25%;
-    --accent-hover: 50 100% 80%;
+    /* Accent - vibrant but tasteful coral/orange */
+    --accent: 12 85% 70%;             /* warm coral for CTAs */
+    --accent-foreground: 0 0% 100%;
+    --accent-hover: 12 85% 65%;
 
-    /* Muted tones */
-    --muted: 210 30% 95%;
-    --muted-foreground: 210 20% 50%;
+    /* Supporting colors */
+    --success: 145 50% 65%;           /* soft green */
+    --warning: 45 85% 70%;            /* gentle yellow */
+    --cheerful-blue: 205 85% 70%;     /* playful blue accent */
 
-    /* Destructive - Soft coral */
-    --destructive: 0 70% 75%;
+    /* Muted tones - very subtle */
+    --muted: 35 15% 94%;              /* barely there beige */
+    --muted-foreground: 210 10% 55%;
+
+    /* Destructive - soft, non-alarming */
+    --destructive: 0 65% 70%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
-    --border: 210 30% 90%;
-    --input: 210 30% 95%;
-    --ring: 210 100% 75%;
+    /* Borders and inputs - very light */
+    --border: 210 20% 88%;
+    --input: 35 15% 96%;
+    --ring: 195 85% 65%;
 
-    /* Increased border radius for whimsical feel */
-    --radius: 1rem;
+    /* Generous border radius for friendly, soft feel */
+    --radius: 1.25rem;
 
-    /* Story-specific colors */
-    --hero-gradient: linear-gradient(135deg, hsl(210 100% 85%), hsl(120 60% 85%), hsl(50 100% 85%));
-    --magic-purple: 280 70% 85%;
-    --adventure-orange: 25 85% 80%;
-    --success-green: 120 60% 80%;
+    /* Montessori-inspired gradients */
+    --hero-gradient: linear-gradient(135deg, hsl(195 85% 75%), hsl(12 85% 75%));
+    --calm-gradient: linear-gradient(180deg, hsl(35 15% 98%), hsl(35 15% 94%));
+    --playful-gradient: linear-gradient(45deg, hsl(45 85% 80%), hsl(205 85% 80%));
 
-    /* Shadows for playful depth */
-    --shadow-soft: 0 4px 20px hsl(210 50% 85% / 0.3);
-    --shadow-hover: 0 8px 30px hsl(210 50% 80% / 0.4);
-    --shadow-magic: 0 0 30px hsl(280 70% 85% / 0.5);
+    /* Soft, non-distracting shadows */
+    --shadow-gentle: 0 2px 12px hsl(210 20% 80% / 0.15);
+    --shadow-elevated: 0 8px 25px hsl(210 20% 70% / 0.2);
+    --shadow-floating: 0 12px 35px hsl(210 20% 60% / 0.15);
 
     --sidebar-background: 0 0% 98%;
 
@@ -128,40 +133,80 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-headline;
+    @apply font-headline font-semibold;
+  }
+
+  p, span, div {
+    @apply font-body;
+  }
+
+  /* Montessori-inspired button styling */
+  .btn-montessori {
+    @apply rounded-2xl px-6 py-3 font-medium transition-all duration-200;
+    @apply shadow-gentle hover:shadow-elevated;
+    @apply transform hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .btn-primary-montessori {
+    @apply btn-montessori bg-primary text-primary-foreground;
+    @apply hover:bg-primary-hover;
+  }
+
+  .btn-accent-montessori {
+    @apply btn-montessori bg-accent text-accent-foreground;
+    @apply hover:bg-accent-hover;
+  }
+
+  .btn-secondary-montessori {
+    @apply btn-montessori bg-secondary text-secondary-foreground;
+    @apply hover:bg-secondary-hover border border-border;
   }
 }
 
 @layer components {
-  /* Whimsical animations */
-  .animate-bounce-gentle {
-    animation: bounce-gentle 2s infinite;
+  /* Calm, Montessori-inspired animations */
+  .animate-gentle-float {
+    animation: gentle-float 4s ease-in-out infinite;
   }
 
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
+  .animate-soft-bounce {
+    animation: soft-bounce 2s ease-in-out infinite;
   }
 
-  .animate-wiggle {
-    animation: wiggle 1s ease-in-out;
+  /* Montessori card styling - clean and elevated */
+  .card-montessori {
+    @apply bg-card rounded-2xl shadow-gentle border border-border/50;
+    @apply transition-all duration-300 hover:shadow-elevated hover:-translate-y-1;
   }
 
-  /* Interactive hover effects */
-  .btn-whimsical {
-    @apply transition-all duration-300 hover:scale-105 hover:shadow-lg;
+  .card-interactive {
+    @apply card-montessori cursor-pointer;
+    @apply hover:border-primary/30 hover:scale-[1.02];
   }
 
-  .card-magical {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-  }
-
-  /* Gradient backgrounds */
-  .bg-hero-gradient {
+  /* Gradient backgrounds - calm and warm */
+  .bg-hero-montessori {
     background: var(--hero-gradient);
   }
 
-  .bg-magic-glow {
-    background: radial-gradient(circle at center, hsl(var(--magic-purple) / 0.3), transparent 70%);
+  .bg-calm-section {
+    background: var(--calm-gradient);
+  }
+
+  .bg-playful-accent {
+    background: var(--playful-gradient);
+  }
+
+  /* Section dividers - organic shapes */
+  .section-divider {
+    @apply w-full h-16 relative overflow-hidden;
+    background: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--muted)));
+  }
+
+  .section-divider::before {
+    content: '';
+    @apply absolute inset-0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,96 Q300,0 600,48 T1200,96 L1200,120 L0,120 Z' fill='%23ffffff'/%3E%3C/svg%3E") center/cover no-repeat;
   }
 
   /* Magic Wand Components */
@@ -476,16 +521,16 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
     text-shadow: 0 2px 4px hsl(0 0% 0% / 0.1);
   }
 
-  .shadow-magical {
-    box-shadow: var(--shadow-magic);
+  .shadow-gentle {
+    box-shadow: var(--shadow-gentle);
   }
 
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
   }
 
-  .shadow-hover {
-    box-shadow: var(--shadow-hover);
+  .shadow-floating {
+    box-shadow: var(--shadow-floating);
   }
 
   /* Mobile-first utilities */
@@ -536,33 +581,35 @@ All colors MUST be HSL. Pastel blues, greens, and yellows.
   }
 }
 
-@keyframes bounce-gentle {
+@keyframes gentle-float {
   0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-4px) rotate(0.5deg);
+  }
+  66% {
+    transform: translateY(-2px) rotate(-0.5deg);
+  }
+}
+
+@keyframes soft-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.02);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
     transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes wiggle {
-  0%, 100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-3deg);
-  }
-  75% {
-    transform: rotate(3deg);
   }
 }
 

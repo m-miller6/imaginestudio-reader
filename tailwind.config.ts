@@ -19,9 +19,10 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				'headline': ['Nunito', 'sans-serif'],
-				'playful': ['Comic Neue', 'cursive'],
-				'sans': ['Nunito', 'sans-serif'],
+				'headline': ['Nunito Sans', 'Nunito', 'system-ui', 'sans-serif'],
+				'body': ['Inter', 'system-ui', 'sans-serif'],
+				'playful': ['Nunito Sans', 'system-ui', 'sans-serif'],
+				'sans': ['Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -70,11 +71,16 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				magic: {
-					purple: 'hsl(var(--magic-purple))',
-					orange: 'hsl(var(--adventure-orange))',
-					green: 'hsl(var(--success-green))'
-				}
+				// Montessori-inspired color palette
+				success: 'hsl(var(--success))',
+				warning: 'hsl(var(--warning))',
+				'cheerful-blue': 'hsl(var(--cheerful-blue))',
+				
+				// Gradients for sections
+				'hero-from': 'hsl(195 85% 75%)',
+				'hero-to': 'hsl(12 85% 75%)',
+				'calm-from': 'hsl(35 15% 98%)',
+				'calm-to': 'hsl(35 15% 94%)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
