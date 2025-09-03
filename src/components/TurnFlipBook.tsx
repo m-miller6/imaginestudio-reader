@@ -43,47 +43,104 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
   // Initialize turn.js
   useEffect(() => {
     const el = bookRef.current;
-    if (!el || typeof $ === "undefined") return;
+    
+    // Check if element exists
+    if (!el || typeof window === "undefined") return;
+    
+    const initializeTurnJS = () => {
+      // Check if jQuery and turn.js are available
+      if (typeof $ === "undefined" || typeof $.fn.turn === "undefined") {
+        return false;
+      }
 
-    const $book = $(el);
+      const $book = $(el);
 
-    // Helper: responsive sizing
-    const sizeToWrapper = () => {
-      const wrapper = wrapperRef.current;
-      if (!wrapper) return;
-      const maxWidth = Math.min(wrapper.clientWidth, 1100);
-      const width = Math.max(480, maxWidth);
-      const height = Math.round(width * 0.68); // pleasant aspect
+      // Helper: responsive sizing
+      const sizeToWrapper = () => {
+        const wrapper = wrapperRef.current;
+        if (!wrapper) return;
+        const maxWidth = Math.min(wrapper.clientWidth, 1100);
+        const width = Math.max(480, maxWidth);
+        const height = Math.round(width * 0.68); // pleasant aspect
+        try {
+          if (typeof $book.turn === "function") {
+            $book.turn("size", width, height);
+          }
+        } catch (error) {
+          console.error("Error resizing turn.js book:", error);
+        }
+      };
+
       try {
-        $book.turn("size", width, height);
-      } catch {}
+        // Initialize plugin
+        $book.turn({
+          display: "double",
+          autoCenter: true,
+          elevation: 50,
+          gradients: true,
+          duration: 800,
+          page: (currentPage - 1) * 2 + 1,
+          when: {
+            turned: (_e: any, page: number) => {
+              const spread = Math.ceil(page / 2);
+              if (spread !== currentPage) onPageChange(spread);
+            },
+          },
+        });
+
+        sizeToWrapper();
+        const onResize = () => sizeToWrapper();
+        window.addEventListener("resize", onResize);
+
+        return () => {
+          window.removeEventListener("resize", onResize);
+          try {
+            if (typeof $book.turn === "function") {
+              $book.turn("destroy");
+            }
+          } catch (error) {
+            console.error("Error destroying turn.js book:", error);
+          }
+        };
+      } catch (error) {
+        console.error("Error initializing turn.js book:", error);
+        return false;
+      }
     };
 
-    // Initialize plugin
-    $book.turn({
-      display: "double",
-      autoCenter: true,
-      elevation: 50,
-      gradients: true,
-      duration: 800,
-      page: (currentPage - 1) * 2 + 1,
-      when: {
-        turned: (_e: any, page: number) => {
-          const spread = Math.ceil(page / 2);
-          if (spread !== currentPage) onPageChange(spread);
-        },
-      },
-    });
+    // Try to initialize immediately
+    const cleanup = initializeTurnJS();
+    if (cleanup) {
+      return cleanup;
+    }
 
-    sizeToWrapper();
-    const onResize = () => sizeToWrapper();
-    window.addEventListener("resize", onResize);
+    // If not ready, poll for libraries to be available
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max
+    let cleanup2: (() => void) | undefined;
+
+    const pollForLibraries = () => {
+      attempts++;
+      const result = initializeTurnJS();
+      
+      if (result) {
+        cleanup2 = result;
+        return;
+      }
+      
+      if (attempts < maxAttempts) {
+        setTimeout(pollForLibraries, 100);
+      } else {
+        console.error("Turn.js libraries failed to load within timeout");
+      }
+    };
+
+    setTimeout(pollForLibraries, 100);
 
     return () => {
-      window.removeEventListener("resize", onResize);
-      try {
-        $book.turn("destroy");
-      } catch {}
+      if (cleanup2) {
+        cleanup2();
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -91,13 +148,18 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
   // Keep plugin page in sync when prop changes
   useEffect(() => {
     const el = bookRef.current;
-    if (!el || typeof $ === "undefined") return;
+    if (!el || typeof $ === "undefined" || typeof $.fn.turn === "undefined") return;
+    
     const $book = $(el);
     try {
-      const target = (currentPage - 1) * 2 + 1;
-      const cur = $book.turn("page");
-      if (cur !== target) $book.turn("page", target);
-    } catch {}
+      if (typeof $book.turn === "function") {
+        const target = (currentPage - 1) * 2 + 1;
+        const cur = $book.turn("page");
+        if (cur !== target) $book.turn("page", target);
+      }
+    } catch (error) {
+      console.error("Error changing turn.js page:", error);
+    }
   }, [currentPage]);
 
   return (
