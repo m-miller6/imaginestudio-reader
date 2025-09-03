@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
-import { PageFlipBook } from "@/components/PageFlipBook";
 import { TurnFlipBook } from "@/components/TurnFlipBook";
 import { useIsMobile } from "@/hooks/use-mobile";
 import heroIllustration from "@/assets/story-hero-illustration.jpg";
