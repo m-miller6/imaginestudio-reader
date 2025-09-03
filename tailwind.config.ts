@@ -76,6 +76,19 @@ export default {
 				warning: 'hsl(var(--warning))',
 				'cheerful-blue': 'hsl(var(--cheerful-blue))',
 				
+				// Book colors for authentic reading experience
+				cream: {
+					'50': 'hsl(var(--cream-50))',
+					'100': 'hsl(var(--cream-100))'
+				},
+				amber: {
+					'50': 'hsl(var(--amber-50))',
+					'200': 'hsl(var(--amber-200))',
+					'700': 'hsl(var(--amber-700))',
+					'800': 'hsl(var(--amber-800))',
+					'900': 'hsl(var(--amber-900))'
+				},
+				
 				// Gradients for sections
 				'hero-from': 'hsl(195 85% 75%)',
 				'hero-to': 'hsl(12 85% 75%)',

@@ -40,6 +40,15 @@ Typography: Rounded, approachable fonts for warmth and friendliness
     --success: 145 50% 65%;           /* soft green */
     --warning: 45 85% 70%;            /* gentle yellow */
     --cheerful-blue: 205 85% 70%;     /* playful blue accent */
+    
+    /* Book colors - warm, paper-like tones */
+    --cream-50: 47 100% 98%;          /* very light cream */
+    --cream-100: 45 86% 94%;          /* light cream for pages */
+    --amber-50: 48 100% 96%;          /* lightest amber */
+    --amber-200: 45 93% 88%;          /* light amber for borders */
+    --amber-700: 26 90% 37%;          /* darker amber for text */
+    --amber-800: 25 95% 53%;          /* book spine dark */
+    --amber-900: 21 77% 26%;          /* darkest amber for text */
 
     /* Muted tones - very subtle */
     --muted: 35 15% 94%;              /* barely there beige */
@@ -644,4 +653,86 @@ Typography: Rounded, approachable fonts for warmth and friendliness
     transform: translateY(-5px) scale(1.2);
     opacity: 1;
   }
+}
+
+/* Turn.js Book Styling - Authentic Book Experience */
+.book-pages {
+  position: relative;
+  border-radius: 0 8px 8px 0;
+  overflow: visible !important;
+  background: linear-gradient(to right, 
+    hsl(var(--amber-800)), 
+    hsl(var(--amber-700)), 
+    hsl(var(--cream-50))
+  );
+}
+
+.book-pages .page {
+  position: absolute !important;
+  background: linear-gradient(to bottom, 
+    hsl(var(--cream-50)), 
+    hsl(var(--cream-100))
+  );
+  border: 1px solid hsl(var(--amber-200));
+  box-shadow: 
+    2px 2px 8px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  margin: 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.book-pages .page:nth-child(odd) {
+  border-radius: 4px 0 0 4px;
+  border-right: 2px solid hsl(var(--amber-300));
+}
+
+.page-wrapper {
+  position: relative;
+  background: linear-gradient(to bottom, 
+    hsl(var(--cream-50)), 
+    hsl(var(--cream-100))
+  );
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.page-content {
+  position: relative;
+  background: linear-gradient(135deg, 
+    hsl(var(--cream-50)) 0%, 
+    hsl(var(--amber-50)) 50%, 
+    hsl(var(--cream-100)) 100%
+  );
+  border: 1px solid hsl(var(--amber-200) / 0.3);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.4),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Page texture and paper effect */
+.page-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 25px 25px, rgba(255,255,255,0.2) 2%, transparent 0%),
+    radial-gradient(circle at 75px 75px, rgba(255,255,255,0.1) 1%, transparent 0%);
+  background-size: 50px 50px;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* Turn.js specific overrides */
+.book-pages .turn-page {
+  box-shadow: 
+    0 5px 20px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.book-pages .turn-page.turn-page-wrapper {
+  border-radius: 4px;
+  overflow: hidden;
 }
