@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, MapPin, Clock, Star } from "lucide-react";
+import { Search, Filter, MapPin, Clock, Star, ChevronDown } from "lucide-react";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 
 // Import story covers
 import dragonValleyCover from "@/assets/dragon-valley-cover.jpg";
@@ -22,6 +23,11 @@ import forestFriendsCover from "@/assets/forest-friends-cover.jpg";
 const Explore = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedFilters, setSelectedFilters] = useState({
+    categories: [] as string[],
+    readingLevels: [] as string[],
+    durations: [] as string[]
+  });
 
   const featuredStories = [
     { title: "Dragon Valley", genre: "Fantasy", difficulty: "Beginner", duration: "15 min", rating: 4.8, image: dragonValleyCover, description: "Befriend mighty dragons in an enchanted valley" },
@@ -54,8 +60,39 @@ const Explore = () => {
     
     const matchesCategory = selectedCategory === null || story.genre === selectedCategory;
     
-    return matchesSearch && matchesCategory;
+    // Filter by dropdown filters
+    const matchesDropdownCategory = selectedFilters.categories.length === 0 || 
+      selectedFilters.categories.includes(story.genre);
+    
+    const matchesReadingLevel = selectedFilters.readingLevels.length === 0 || 
+      selectedFilters.readingLevels.includes(story.difficulty);
+    
+    const matchesDuration = selectedFilters.durations.length === 0 || 
+      selectedFilters.durations.includes(story.duration);
+    
+    return matchesSearch && matchesCategory && matchesDropdownCategory && matchesReadingLevel && matchesDuration;
   });
+
+  const toggleFilter = (filterType: keyof typeof selectedFilters, value: string) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterType]: prev[filterType].includes(value)
+        ? prev[filterType].filter(item => item !== value)
+        : [...prev[filterType], value]
+    }));
+  };
+
+  const clearAllFilters = () => {
+    setSelectedFilters({
+      categories: [],
+      readingLevels: [],
+      durations: []
+    });
+  };
+
+  const hasActiveFilters = selectedFilters.categories.length > 0 || 
+    selectedFilters.readingLevels.length > 0 || 
+    selectedFilters.durations.length > 0;
 
   const filteredNewReleases = newReleases.filter(story =>
     searchQuery === "" ||
@@ -125,10 +162,59 @@ const Explore = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-headline font-bold text-foreground">Featured Stories</h2>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              Filter
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className={hasActiveFilters ? "bg-category-active border-category-active" : ""}>
+                  <Filter className="h-4 w-4 mr-2" />
+                  Filter
+                  <ChevronDown className="h-4 w-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Filter Stories</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
+                {["Fantasy", "Adventure", "Sci-Fi", "Mystery", "Educational"].map((category) => (
+                  <DropdownMenuCheckboxItem
+                    key={category}
+                    checked={selectedFilters.categories.includes(category)}
+                    onCheckedChange={() => toggleFilter("categories", category)}
+                  >
+                    {category}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Reading Level</DropdownMenuLabel>
+                {["Beginner", "Intermediate", "Advanced"].map((level) => (
+                  <DropdownMenuCheckboxItem
+                    key={level}
+                    checked={selectedFilters.readingLevels.includes(level)}
+                    onCheckedChange={() => toggleFilter("readingLevels", level)}
+                  >
+                    {level}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Read Time</DropdownMenuLabel>
+                {["12 min", "15 min", "20 min", "25 min"].map((duration) => (
+                  <DropdownMenuCheckboxItem
+                    key={duration}
+                    checked={selectedFilters.durations.includes(duration)}
+                    onCheckedChange={() => toggleFilter("durations", duration)}
+                  >
+                    {duration}
+                  </DropdownMenuCheckboxItem>
+                ))}
+                
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={clearAllFilters} className="text-muted-foreground">
+                  Clear all filters
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
