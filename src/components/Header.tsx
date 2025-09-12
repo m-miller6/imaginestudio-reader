@@ -68,7 +68,7 @@ const Header = () => {
           <img 
             src={talesOfYouLogo} 
             alt="Tales of You" 
-            className="h-16 md:h-20 w-auto relative z-10"
+            className="h-64 md:h-80 w-auto relative z-10"
           />
         </Link>
         
@@ -121,7 +121,7 @@ const Header = () => {
                         <img 
                           src={talesOfYouLogo} 
                           alt="Tales of You" 
-                          className="h-12 w-auto"
+                          className="h-48 w-auto"
                         />
                       </div>
                     </div>
