@@ -68,7 +68,7 @@ const Header = () => {
           <img 
             src={talesOfYouLogo} 
             alt="Tales of You" 
-            className="h-24 md:h-28 w-auto relative z-10 transform scale-125"
+            className="h-24 md:h-28 w-auto relative z-10 transform scale-150"
           />
         </Link>
         
@@ -121,7 +121,7 @@ const Header = () => {
                         <img 
                           src={talesOfYouLogo} 
                           alt="Tales of You" 
-                          className="h-16 w-auto transform scale-110"
+                          className="h-16 w-auto transform scale-150"
                         />
                       </div>
                     </div>
