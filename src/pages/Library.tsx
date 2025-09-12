@@ -1,7 +1,9 @@
-import { BookOpen, Play, Star } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, Play, Star, Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
@@ -9,6 +11,8 @@ import neverlandCover from "@/assets/trip-to-neverland-cover.jpg";
 import christmasCover from "@/assets/odyssey-first-christmas-cover.jpg";
 
 const Library = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+
   const savedStories = [
     {
       title: "Trip to NeverLand",
@@ -47,13 +51,23 @@ const Library = () => {
       
       {/* Hero Section */}
       <section className="p-6 py-12 bg-hero-montessori">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-white mb-4">
             Your Story Library
           </h2>
-          <p className="font-playful text-lg md:text-xl text-white/90">
+          <p className="font-playful text-lg md:text-xl text-white/90 mb-8">
             All your magical adventures in one place
           </p>
+          
+          <div className="relative max-w-md mx-auto">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+            <Input
+              placeholder="Search your library..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-4 py-3 text-lg"
+            />
+          </div>
         </div>
       </section>
 
@@ -61,7 +75,12 @@ const Library = () => {
         <div className="max-w-6xl mx-auto space-y-6">
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {savedStories.map((story, index) => (
+            {savedStories
+              .filter(story => 
+                searchQuery === "" || 
+                story.title.toLowerCase().includes(searchQuery.toLowerCase())
+              )
+              .map((story, index) => (
               <Card key={index} className="card-magical shadow-soft border-2 border-border overflow-hidden">
                 <CardHeader className="p-0">
                   <Link
