@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 
 interface PageContent {
   text: string;
-  illustration: string;
+  illustration?: string;
+  video?: string;
 }
 
 interface TurnFlipBookProps {
@@ -16,6 +17,7 @@ interface TurnFlipBookProps {
 export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: TurnFlipBookProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const bookRef = useRef<HTMLDivElement>(null);
+  const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
 
   // Build individual pages: for each spread, generate 2 pages (left text, right image)
   const flatPages = useMemo(() => {
@@ -37,7 +39,39 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
       );
       out.push(
         <div key={`img-${spreadNum}`} className="page bg-gradient-to-br from-cream-50 to-amber-50 border-l border-amber-200/50 relative">
-          <img src={p.illustration} alt="Story page" className="w-full h-full object-cover rounded-sm" />
+          {p.video ? (
+            <video 
+              ref={(el) => {
+                if (el) {
+                  videoRefs.current.set(spreadNum * 2, el);
+                } else {
+                  videoRefs.current.delete(spreadNum * 2);
+                }
+              }}
+              src={p.video} 
+              className="w-full h-full object-cover rounded-sm" 
+              loop 
+              muted
+              playsInline
+              onLoadedData={() => {
+                // Video is ready to play
+                const video = videoRefs.current.get(spreadNum * 2);
+                if (video && currentPage === spreadNum) {
+                  video.play().catch(console.error);
+                }
+              }}
+            />
+          ) : (
+            <img src={p.illustration} alt="Story page" className="w-full h-full object-cover rounded-sm" />
+          )}
+          {/* Play/Pause indicator for videos */}
+          {p.video && (
+            <div className="absolute top-4 right-4 bg-black/50 text-white p-2 rounded-full">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              </svg>
+            </div>
+          )}
           {/* Page number */}
           <div className="absolute bottom-4 left-4 text-xs text-amber-700 font-medium bg-white/80 px-2 py-1 rounded">{spreadNum * 2}</div>
           {/* Image border shadow */}
@@ -153,7 +187,7 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep plugin page in sync when prop changes
+  // Keep plugin page in sync when prop changes and handle video playback
   useEffect(() => {
     const el = bookRef.current;
     if (!el || typeof $ === "undefined" || typeof $.fn.turn === "undefined") return;
@@ -168,6 +202,19 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
     } catch (error) {
       console.error("Error changing turn.js page:", error);
     }
+
+    // Handle video playback based on current page
+    videoRefs.current.forEach((video, pageNum) => {
+      const pageSpread = Math.ceil(pageNum / 2);
+      if (pageSpread === currentPage) {
+        // Play video for current page
+        video.play().catch(console.error);
+      } else {
+        // Pause videos not on current page
+        video.pause();
+        video.currentTime = 0; // Reset to beginning
+      }
+    });
   }, [currentPage]);
 
   return (

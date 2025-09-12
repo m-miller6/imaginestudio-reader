@@ -13,6 +13,7 @@ import Library from "./pages/Library";
 import Profile from "./pages/Profile";
 import StoryDetail from "./pages/StoryDetail";
 import Signup from "./pages/Signup";
+import MoonBalloonReader from "./pages/MoonBalloonReader";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/library" element={<Library />} />
               <Route path="/story/:storyId" element={<StoryDetail />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/moon-balloon" element={<MoonBalloonReader />} />
               <Route path="/profile" element={<Profile />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

@@ -19,6 +19,7 @@ import pirateTreasureCover from "@/assets/pirate-treasure-cover.jpg";
 import wizardSchoolCover from "@/assets/wizard-school-cover.jpg";
 import oceanAdventureCover from "@/assets/ocean-adventure-cover.jpg";
 import forestFriendsCover from "@/assets/forest-friends-cover.jpg";
+import moonBalloonCover from "@/assets/moon-balloon-cover.png";
 
 const Explore = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,6 +31,16 @@ const Explore = () => {
   });
 
   const featuredStories = [
+    { 
+      id: 25,
+      title: "The Moon Balloon", 
+      genre: "Animated", 
+      difficulty: "Beginner", 
+      duration: "12 min", 
+      rating: 5.0, 
+      image: moonBalloonCover, 
+      description: "Follow Nico on a magical adventure with animated scenes as he discovers a glowing balloon that takes him to the stars" 
+    },
     { title: "Dragon Valley", genre: "Fantasy", difficulty: "Beginner", duration: "15 min", rating: 4.8, image: dragonValleyCover, description: "Befriend mighty dragons in an enchanted valley" },
     { title: "Space Explorer", genre: "Sci-Fi", difficulty: "Intermediate", duration: "20 min", rating: 4.9, image: spaceExplorerCover, description: "Journey through the cosmos and discover new worlds" },
     { title: "Princess Castle", genre: "Fantasy", difficulty: "Beginner", duration: "12 min", rating: 4.7, image: princessCastleCover, description: "Royal adventures await in this magical kingdom" },
@@ -37,6 +48,7 @@ const Explore = () => {
   ];
 
   const categories = [
+    { name: "Animated", count: 1, color: "bg-gradient-to-r from-indigo-500 to-purple-500" },
     { name: "Fantasy", count: 45, color: "bg-purple-500" },
     { name: "Adventure", count: 38, color: "bg-green-500" },
     { name: "Sci-Fi", count: 29, color: "bg-blue-500" },
@@ -260,7 +272,7 @@ const Explore = () => {
             {filteredFeaturedStories.map((story, index) => (
               <Link 
                 key={index} 
-                to={`/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
+                to={story.title === "The Moon Balloon" ? "/moon-balloon" : `/story/${story.title.toLowerCase().replace(/\s+/g, '-')}`}
               >
                 <Card className="card-magical bg-card border-2 border-border overflow-hidden hover:scale-105 transition-transform">
                   <div className="aspect-video relative">
