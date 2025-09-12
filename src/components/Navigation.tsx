@@ -53,7 +53,7 @@ const Navigation = () => {
             className="flex items-center gap-2 font-playful h-12 px-8 touch-target"
           >
             <PlusCircle className="h-6 w-6" />
-            Add Stories
+            Create
           </Button>
         </Link>
       </div>
