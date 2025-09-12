@@ -164,7 +164,7 @@ const Library = () => {
             <Link to="/create-character">
               <Button variant="whimsical" size="lg" className="font-playful">
                 <BookOpen className="h-5 w-5 mr-2" />
-                Create New Adventure
+                Create
               </Button>
             </Link>
           </div>
