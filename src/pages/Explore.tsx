@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, MapPin, Clock, Star, ChevronDown } from "lucide-react";
+import { Search, Filter, MapPin, Clock, Star, ChevronDown, X } from "lucide-react";
 import Header from "@/components/Header";
 import Navigation from "@/components/Navigation";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -94,6 +94,23 @@ const Explore = () => {
     selectedFilters.readingLevels.length > 0 || 
     selectedFilters.durations.length > 0;
 
+  const removeFilter = (filterType: keyof typeof selectedFilters, value: string) => {
+    setSelectedFilters(prev => ({
+      ...prev,
+      [filterType]: prev[filterType].filter(item => item !== value)
+    }));
+  };
+
+  const getAllActiveFilters = () => {
+    const filters: Array<{type: keyof typeof selectedFilters, value: string, label: string}> = [];
+    
+    selectedFilters.categories.forEach(cat => filters.push({type: 'categories', value: cat, label: cat}));
+    selectedFilters.readingLevels.forEach(level => filters.push({type: 'readingLevels', value: level, label: level}));
+    selectedFilters.durations.forEach(duration => filters.push({type: 'durations', value: duration, label: duration}));
+    
+    return filters;
+  };
+
   const filteredNewReleases = newReleases.filter(story =>
     searchQuery === "" ||
     story.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -161,7 +178,29 @@ const Explore = () => {
       <section className="p-6 bg-muted/30">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-headline font-bold text-foreground">Featured Stories</h2>
+            <div className="flex items-center gap-4">
+              <h2 className="text-2xl font-headline font-bold text-foreground">Featured Stories</h2>
+              
+              {/* Active Filter Badges */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {getAllActiveFilters().map((filter, index) => (
+                  <Badge 
+                    key={`${filter.type}-${filter.value}-${index}`}
+                    variant="secondary" 
+                    className="bg-muted text-muted-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+                  >
+                    {filter.label}
+                    <button
+                      onClick={() => removeFilter(filter.type, filter.value)}
+                      className="ml-2 hover:text-foreground transition-colors"
+                      aria-label={`Remove ${filter.label} filter`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className={hasActiveFilters ? "bg-category-active border-category-active" : ""}>
