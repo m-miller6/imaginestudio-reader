@@ -6,7 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import talesOfYouLogo from "@/assets/tales-of-you-logo.png";
+import talesOfYouLogo from "@/assets/tales-of-you-transparent.png";
 
 const Header = () => {
   const location = useLocation();
@@ -68,7 +68,7 @@ const Header = () => {
           <img 
             src={talesOfYouLogo} 
             alt="Tales of You" 
-            className="h-64 md:h-80 w-auto relative z-10"
+            className="h-16 md:h-20 w-auto relative z-10"
           />
         </Link>
         
@@ -121,7 +121,7 @@ const Header = () => {
                         <img 
                           src={talesOfYouLogo} 
                           alt="Tales of You" 
-                          className="h-48 w-auto"
+                          className="h-12 w-auto"
                         />
                       </div>
                     </div>
