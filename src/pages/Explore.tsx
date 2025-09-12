@@ -21,6 +21,7 @@ import forestFriendsCover from "@/assets/forest-friends-cover.jpg";
 
 const Explore = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const featuredStories = [
     { title: "Dragon Valley", genre: "Fantasy", difficulty: "Beginner", duration: "15 min", rating: 4.8, image: dragonValleyCover, description: "Befriend mighty dragons in an enchanted valley" },
@@ -45,12 +46,16 @@ const Explore = () => {
     { title: "Forest Friends", image: forestFriendsCover, isNew: true },
   ];
 
-  const filteredFeaturedStories = featuredStories.filter(story => 
-    searchQuery === "" || 
-    story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    story.genre.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFeaturedStories = featuredStories.filter(story => {
+    const matchesSearch = searchQuery === "" || 
+      story.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      story.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      story.genre.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = selectedCategory === null || story.genre === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   const filteredNewReleases = newReleases.filter(story =>
     searchQuery === "" ||
@@ -95,7 +100,13 @@ const Explore = () => {
           <h2 className="text-2xl font-headline font-bold mb-6 text-foreground">Browse by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {filteredCategories.map((category) => (
-              <Card key={category.name} className="card-magical cursor-pointer hover:scale-105 transition-transform">
+              <Card 
+                key={category.name} 
+                className={`card-magical cursor-pointer hover:scale-105 transition-transform ${
+                  selectedCategory === category.name ? 'bg-category-active border-category-active' : ''
+                }`}
+                onClick={() => setSelectedCategory(selectedCategory === category.name ? null : category.name)}
+              >
                 <CardContent className="p-4 text-center">
                   <div className={`w-12 h-12 ${category.color} rounded-full mx-auto mb-3 flex items-center justify-center`}>
                     <span className="text-white font-bold text-lg">{category.name[0]}</span>
