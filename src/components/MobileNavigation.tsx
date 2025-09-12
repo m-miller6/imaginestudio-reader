@@ -44,9 +44,9 @@ const MobileNavigation = () => {
           return (
             <Link key={item.to} to={item.to} className="flex-1">
               <Button
-                variant={item.isActive ? "default" : "ghost"}
+                variant="ghost"
                 size="sm"
-                className="flex flex-col items-center gap-1 h-auto py-2 px-1 w-full touch-target tap-highlight-none"
+                className={`flex flex-col items-center gap-1 h-auto py-2 px-1 w-full touch-target tap-highlight-none ${item.isActive ? "squiggly-underline" : ""}`}
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-xs font-medium">{item.label}</span>

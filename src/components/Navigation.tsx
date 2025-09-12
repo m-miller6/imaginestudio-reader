@@ -15,9 +15,9 @@ const Navigation = () => {
       <div className="max-w-4xl mx-auto flex justify-center items-center gap-6 md:gap-8 px-6">
         <Link to="/">
           <Button 
-            variant={location.pathname === "/" ? "default" : "ghost"} 
+            variant="ghost" 
             size="lg" 
-            className="flex items-center gap-2 h-12 px-6 touch-target"
+            className={`flex items-center gap-2 h-12 px-6 touch-target ${location.pathname === "/" ? "squiggly-underline" : ""}`}
           >
             <Home className="h-5 w-5" />
             <span className="hidden md:inline">Home</span>
@@ -26,9 +26,9 @@ const Navigation = () => {
         
         <Link to="/explore">
           <Button 
-            variant={location.pathname === "/explore" ? "default" : "ghost"} 
+            variant="ghost" 
             size="lg" 
-            className="flex items-center gap-2 h-12 px-6 touch-target"
+            className={`flex items-center gap-2 h-12 px-6 touch-target ${location.pathname === "/explore" ? "squiggly-underline" : ""}`}
           >
             <Compass className="h-5 w-5" />
             <span className="hidden md:inline">Explore</span>
@@ -37,9 +37,9 @@ const Navigation = () => {
         
         <Link to="/library">
           <Button 
-            variant={location.pathname === "/library" ? "default" : "ghost"} 
+            variant="ghost" 
             size="lg" 
-            className="flex items-center gap-2 h-12 px-6 touch-target"
+            className={`flex items-center gap-2 h-12 px-6 touch-target ${location.pathname === "/library" ? "squiggly-underline" : ""}`}
           >
             <Library className="h-5 w-5" />
             <span className="hidden md:inline">Library</span>
