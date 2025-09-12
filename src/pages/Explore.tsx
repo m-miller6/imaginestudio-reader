@@ -68,7 +68,7 @@ const Explore = () => {
       <Navigation />
       
       {/* Hero Section with Search */}
-      <section className="p-6 bg-hero-gradient">
+      <section className="p-6 bg-hero-montessori">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-headline font-bold text-primary-foreground mb-4">
             Explore Magical Stories
