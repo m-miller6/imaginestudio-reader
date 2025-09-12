@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import talesOfYouLogo from "@/assets/tales-of-you-logo.png";
 
 const Header = () => {
   const location = useLocation();
@@ -63,17 +64,12 @@ const Header = () => {
       <div className="flex justify-between items-center relative z-20">
         <div className="flex-1" />
         
-        <Link to="/" className="flex-1 text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold text-black relative z-10">
-            <span className="text-black">im</span>
-            <span className="text-yellow-500">A</span>
-            <span className="text-black">g</span>
-            <span className="text-yellow-500">I</span>
-            <span className="text-black">ne</span>
-          </h1>
-          <p className="text-lg md:text-xl font-playful text-black mt-1 relative z-10">
-            Studios
-          </p>
+        <Link to="/" className="flex-1 flex justify-center">
+          <img 
+            src={talesOfYouLogo} 
+            alt="Tales of You" 
+            className="h-16 md:h-20 w-auto relative z-10"
+          />
         </Link>
         
         <div className="flex-1 flex justify-end items-center gap-3">
@@ -122,16 +118,11 @@ const Header = () => {
                         Welcome back to
                       </p>
                       <div className="flex flex-col items-center">
-                        <h1 className="text-3xl font-headline font-bold text-foreground">
-                          <span className="text-foreground">im</span>
-                          <span className="text-yellow-500">A</span>
-                          <span className="text-foreground">g</span>
-                          <span className="text-yellow-500">I</span>
-                          <span className="text-foreground">ne</span>
-                        </h1>
-                        <p className="text-lg font-playful text-foreground">
-                          Studios
-                        </p>
+                        <img 
+                          src={talesOfYouLogo} 
+                          alt="Tales of You" 
+                          className="h-12 w-auto"
+                        />
                       </div>
                     </div>
                   </DialogHeader>
