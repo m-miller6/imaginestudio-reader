@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import StoryDetail from "./pages/StoryDetail";
 import Signup from "./pages/Signup";
 import MoonBalloonReader from "./pages/MoonBalloonReader";
-import NotFound from "./pages/NotFound";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
