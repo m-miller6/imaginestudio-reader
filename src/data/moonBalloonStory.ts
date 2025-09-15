@@ -1,8 +1,8 @@
 // Sample story data for "The Moon Balloon" with video pages
 export const moonBalloonPages = [
   {
-    text: "Once upon a time, there was a little boy named Nico who loved to look at the stars. Every night, he would sit by his window and dream of floating among them.",
-    video: "https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a681f3977a76319ee2a&profile_id=139&oauth2_token_id=57447761" // Sample space video
+    text: "In a hush of midnight, a restless boy twists beneath his quilt.",
+    video: "https://cdn.openart.ai/production/2025-09/uploads/DqlgvGGyx3QYT6714I0A/file_fZeoGbG7_1757710515827.mp4"
   },
   {
     text: "One magical evening, Nico discovered something extraordinary in his backyard - a glowing balloon that seemed to be made of moonlight itself!",
