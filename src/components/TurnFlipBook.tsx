@@ -19,43 +19,40 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
   const bookRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
 
-  // Build individual pages for turn.js - each page needs to be a direct child
+  // Build Turn.js pages - each story page becomes 2 Turn.js pages (text + video)
   const flatPages = useMemo(() => {
     const out: Array<JSX.Element> = [];
     
     pages.forEach((pageData, idx) => {
-      const spreadNum = idx + 1;
+      const storyPageNum = idx + 1;
       
-      // Left page - Text content
+      // Text page (left side of spread)
       out.push(
-        <div key={`page-${spreadNum * 2 - 1}`} className="page book-page-left">
+        <div key={`text-${storyPageNum}`} className="page">
           <div className="page-content">
-            {/* Text content */}
             <div className="page-text">
               <p className="text-3xl leading-relaxed font-serif tracking-wide">
                 {pageData.text}
               </p>
             </div>
-            
-            {/* Page number */}
             <div className="page-number">
-              {spreadNum * 2 - 1}
+              {idx * 2 + 1}
             </div>
           </div>
         </div>
       );
       
-      // Right page - Video/Illustration content
+      // Video/Illustration page (right side of spread)
       out.push(
-        <div key={`page-${spreadNum * 2}`} className="page book-page-right">
+        <div key={`media-${storyPageNum}`} className="page">
           <div className="page-content">
             {pageData.video ? (
               <video 
                 ref={(el) => {
                   if (el) {
-                    videoRefs.current.set(spreadNum, el);
+                    videoRefs.current.set(storyPageNum, el);
                   } else {
-                    videoRefs.current.delete(spreadNum);
+                    videoRefs.current.delete(storyPageNum);
                   }
                 }}
                 src={pageData.video} 
@@ -64,8 +61,8 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
                 muted
                 playsInline
                 onLoadedData={() => {
-                  const video = videoRefs.current.get(spreadNum);
-                  if (video && currentPage === spreadNum) {
+                  const video = videoRefs.current.get(storyPageNum);
+                  if (video && currentPage === storyPageNum) {
                     video.play().catch(console.error);
                   }
                 }}
@@ -82,7 +79,6 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
               </div>
             )}
             
-            {/* Video play indicator */}
             {pageData.video && (
               <div className="absolute top-6 right-6 bg-black/50 text-white p-3 rounded-full backdrop-blur-sm z-10">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -91,9 +87,8 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
               </div>
             )}
             
-            {/* Page number */}
             <div className="page-number">
-              {spreadNum * 2}
+              {idx * 2 + 2}
             </div>
           </div>
         </div>
@@ -237,8 +232,8 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
     }
 
     // Handle video playback
-    videoRefs.current.forEach((video, spreadNum) => {
-      if (spreadNum === currentPage) {
+    videoRefs.current.forEach((video, storyPageNum) => {
+      if (storyPageNum === currentPage) {
         video.play().catch(console.error);
       } else {
         video.pause();
