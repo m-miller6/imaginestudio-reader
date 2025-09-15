@@ -42,15 +42,10 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
         </div>
       );
       
-      // Video/Illustration page (right side of spread) with text above
+      // Video/Illustration page (right side of spread)
       out.push(
         <div key={`media-${storyPageNum}`} className="page">
-          <div className="page-content flex flex-col">
-            <div className="page-text mb-6">
-              <p className="text-2xl leading-relaxed font-serif tracking-wide text-center">
-                In a hush of midnight, a restless boy twists beneath his quilt.
-              </p>
-            </div>
+          <div className="page-content">
             {pageData.video ? (
               <video 
                 ref={(el) => {
@@ -61,7 +56,7 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
                   }
                 }}
                 src={pageData.video} 
-                className="w-80 h-60 object-cover rounded-lg mx-auto" 
+                className="page-illustration" 
                 loop 
                 muted
                 playsInline
@@ -76,10 +71,10 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
               <img 
                 src={pageData.illustration} 
                 alt="Story illustration" 
-                className="w-80 h-60 object-cover rounded-lg mx-auto" 
+                className="page-illustration" 
               />
             ) : (
-              <div className="w-80 h-60 flex items-center justify-center mx-auto">
+              <div className="page-illustration flex items-center justify-center">
                 <div className="text-6xl">📖</div>
               </div>
             )}
@@ -124,7 +119,7 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
         const containerWidth = wrapper.clientWidth;
         const maxWidth = Math.min(containerWidth * 0.9, 1000);
         const width = Math.max(600, maxWidth);
-        const height = Math.round(width * 0.85); // Taller book aspect ratio
+        const height = Math.round(width * 0.7); // Book aspect ratio
         
         try {
           if (typeof $book.turn === "function") {
