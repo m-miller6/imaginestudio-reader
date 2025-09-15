@@ -79,6 +79,9 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
               </div>
             )}
             
+            {/* Spacer div to extend tan background below video */}
+            <div className="flex-1"></div>
+            
             {pageData.video && (
               <div className="absolute top-6 right-6 bg-black/50 text-white p-3 rounded-full backdrop-blur-sm z-10">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

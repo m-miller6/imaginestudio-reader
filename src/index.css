@@ -452,6 +452,11 @@ Typography: Rounded, approachable fonts for warmth and friendliness
 
 .page-illustration {
   @apply p-4;
+  max-height: 65%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .page-preview {
@@ -727,6 +732,8 @@ Typography: Rounded, approachable fonts for warmth and friendliness
 
 .page-content {
   position: relative;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(135deg, 
     hsl(var(--cream-50)) 0%, 
     hsl(var(--amber-50)) 50%, 
