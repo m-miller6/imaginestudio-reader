@@ -28,35 +28,27 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
       
       // Left page - Text content
       out.push(
-        <div key={`page-${spreadNum * 2 - 1}`} className="w-full h-full">
-          <div className="page-content bg-gradient-to-br from-amber-50 via-cream-50 to-amber-100 w-full h-full relative overflow-hidden">
-            {/* Paper texture overlay */}
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JhaW4iIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMC41IiBmaWxsPSJyZ2JhKDIwMCwxODAsMTQwLDAuMSkiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhaW4pIi8+PC9zdmc+')] opacity-20"></div>
-            
+        <div key={`page-${spreadNum * 2 - 1}`} className="page book-page-left">
+          <div className="page-content">
             {/* Text content */}
-            <div className="relative z-10 p-8 h-full flex flex-col justify-center">
-              <div className="prose prose-xl max-w-none text-center">
-                <p className="text-3xl leading-relaxed text-amber-900 font-serif tracking-wide drop-shadow-sm">
-                  {pageData.text}
-                </p>
-              </div>
+            <div className="page-text">
+              <p className="text-3xl leading-relaxed font-serif tracking-wide">
+                {pageData.text}
+              </p>
             </div>
             
             {/* Page number */}
-            <div className="absolute bottom-6 right-6 text-sm text-amber-700 font-medium opacity-60">
+            <div className="page-number">
               {spreadNum * 2 - 1}
             </div>
-            
-            {/* Right border to simulate center crease */}
-            <div className="absolute inset-y-0 right-0 w-px bg-amber-300/50"></div>
           </div>
         </div>
       );
       
       // Right page - Video/Illustration content
       out.push(
-        <div key={`page-${spreadNum * 2}`} className="w-full h-full">
-          <div className="page-content bg-gradient-to-br from-cream-50 via-amber-50 to-cream-100 w-full h-full relative overflow-hidden">
+        <div key={`page-${spreadNum * 2}`} className="page book-page-right">
+          <div className="page-content">
             {pageData.video ? (
               <video 
                 ref={(el) => {
@@ -67,7 +59,7 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
                   }
                 }}
                 src={pageData.video} 
-                className="w-full h-full object-cover" 
+                className="page-illustration" 
                 loop 
                 muted
                 playsInline
@@ -82,17 +74,17 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
               <img 
                 src={pageData.illustration} 
                 alt="Story illustration" 
-                className="w-full h-full object-cover" 
+                className="page-illustration" 
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-amber-100 to-cream-200">
-                <div className="text-amber-600/60 text-6xl">📖</div>
+              <div className="page-illustration flex items-center justify-center">
+                <div className="text-6xl">📖</div>
               </div>
             )}
             
             {/* Video play indicator */}
             {pageData.video && (
-              <div className="absolute top-6 right-6 bg-black/50 text-white p-3 rounded-full backdrop-blur-sm">
+              <div className="absolute top-6 right-6 bg-black/50 text-white p-3 rounded-full backdrop-blur-sm z-10">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
                 </svg>
@@ -100,12 +92,9 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
             )}
             
             {/* Page number */}
-            <div className="absolute bottom-6 left-6 text-sm text-amber-700 font-medium bg-white/80 px-2 py-1 rounded opacity-60">
+            <div className="page-number">
               {spreadNum * 2}
             </div>
-            
-            {/* Left border to simulate center crease */}
-            <div className="absolute inset-y-0 left-0 w-px bg-amber-300/50"></div>
           </div>
         </div>
       );
@@ -263,13 +252,9 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
       {/* Book spine */}
       <div className="book-spine"></div>
       
-      {/* Turn.js book container */}
-      <div ref={bookRef} className="relative bg-white shadow-2xl overflow-hidden">
-        {flatPages.map((page, index) => (
-          <div key={index}>
-            {page}
-          </div>
-        ))}
+      {/* Turn.js book container with proper CSS classes */}
+      <div ref={bookRef} className="book-pages">
+        {flatPages}
       </div>
     </div>
   );
