@@ -119,7 +119,7 @@ export const TurnFlipBook = ({ pages, currentPage, onPageChange, className }: Tu
         const containerWidth = wrapper.clientWidth;
         const maxWidth = Math.min(containerWidth * 0.9, 1000);
         const width = Math.max(600, maxWidth);
-        const height = 600; // Match book spine height
+        const height = 800; // Match increased book spine height
         
         try {
           if (typeof $book.turn === "function") {

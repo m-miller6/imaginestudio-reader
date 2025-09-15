@@ -369,7 +369,7 @@ Typography: Rounded, approachable fonts for warmth and friendliness
   @apply relative mx-auto;
   width: 100%;
   max-width: 800px;
-  height: 600px;
+  height: 800px;
   perspective: 1500px;
   transform-style: preserve-3d;
 }
@@ -542,7 +542,7 @@ Typography: Rounded, approachable fonts for warmth and friendliness
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .book-container {
-    height: 500px;
+    height: 700px;
   }
   
   .page-content {
