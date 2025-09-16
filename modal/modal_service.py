@@ -18,8 +18,31 @@ LORAS = {
     "anime": "ntc-ai/SDXL-LoRA-slider.anime",
     "90s_anime": "ntc-ai/SDXL-LoRA-slider.90s-anime",
     "ghibli": "artificialguybr/StudioGhibli.Redmond-V2",
-    "watercolor": "ostris/watercolor_style_lora_sdxl",
     "pixar": "ntc-ai/SDXL-LoRA-slider.pixar-style",
+}
+
+# Small style guidance to improve consistency per LoRA
+STYLE_HINTS = {
+    "ghibli": {
+        "add": ", studio ghibli style, soft gradients, clean shapes",
+        "neg": ", photorealistic, noisy texture",
+        "default_scale": 0.8,
+    },
+    "anime": {
+        "add": ", anime style, bold lineart, flat shading",
+        "neg": ", photorealistic, noisy texture",
+        "default_scale": 0.8,
+    },
+    "90s_anime": {
+        "add": ", 1990s anime style, retro palette, cel shading",
+        "neg": ", photorealistic, noisy texture",
+        "default_scale": 0.8,
+    },
+    "pixar": {
+        "add": ", pixar style, clean lighting, soft character shading",
+        "neg": ", photorealistic, harsh contrast",
+        "default_scale": 0.8,
+    },
 }
 
 SAFETY_REPO = "CompVis/stable-diffusion-safety-checker"
@@ -112,6 +135,32 @@ def _prepare_ref_image(ref: Image.Image, target_size: int = 512) -> Image.Image:
     )
     return ref
 
+def _snap64(x: int | float) -> int:
+    try:
+        return int(round(float(x) / 64.0) * 64)
+    except Exception:
+        return int(x)
+
+_STOP = {
+    "the","a","an","and","or","but","to","of","in","on","for","with","by",
+    "at","from","as","that","this","these","those","is","are","was","were",
+    "be","been","being","it","its","into","over","under","between","through"
+}
+
+def _shrink_prompt(text: str, max_words: int = 70) -> str:
+    if not text: return text
+    words = []
+    for w in text.replace("\n"," ").split():
+        ww = "".join(ch for ch in w if ch.isalnum() or ch in "-_:,.;")
+        lw = ww.lower()
+        if lw in _STOP and len(words) > 8:
+            continue
+        if ww:
+            words.append(ww)
+        if len(words) >= max_words:
+            break
+    return " ".join(words)
+
 # ───────────────────────── Worker Class ───────────────────────── #
 @app.cls(
     gpu="A100",
@@ -156,7 +205,7 @@ class SDXLLoRAHost:
             weight_name="ip-adapter_sdxl.safetensors",
         )
         try:
-            self.inpaint.set_ip_adapter_scale(0.85)
+            self.inpaint.set_ip_adapter_scale(1.0)
         except Exception:
             pass
 
@@ -168,14 +217,16 @@ class SDXLLoRAHost:
             if self.device != "cuda":
                 p.enable_model_cpu_offload()
 
-        # Start with LoRA disabled
-        self.t2i.disable_lora()
-        self.i2i.disable_lora()
-        self.inpaint.disable_lora()
+        # Track currently active style per pipeline; no preloading
+        self._active_style = {"t2i": None, "i2i": None, "inpaint": None}
+
+        # Start with no style active
+        for p in (self.t2i, self.i2i, self.inpaint):
+            try:
+                p.set_adapters([], [])
+            except Exception:
+                p.disable_lora()
         self.active_adapter = "none"
-        self.t2i.lora_fused = False
-        self.i2i.lora_fused = False
-        self.inpaint.lora_fused = False
 
         # Safety tooling (Transformers 4.44+)
         self.safety_checker = StableDiffusionSafetyChecker.from_pretrained(
@@ -200,37 +251,57 @@ class SDXLLoRAHost:
 
     
 
-    # ─────────────── LoRA adapter switching ─────────────── #
+    # ─────────────── LoRA adapter switching (single-owner loader) ─────────────── #
 
-    def _set_adapter(self, adapter: str, scale: float = 1.0):
+    def _set_adapter_single(self, pipe, pipe_name: str, adapter: str, scale: float):
         adapter = (adapter or "none").lower()
 
+        # turn off style
         if adapter in ("none", "off", "disable"):
-            for p in (self.t2i, self.i2i, self.inpaint):
-                try:
-                    p.disable_lora()
-                except Exception:
-                    pass
-            self.active_adapter = "none"
+            try:
+                # diffusers >= 0.29
+                if hasattr(pipe, "set_adapters"):
+                    pipe.set_adapters([], [])
+                # best-effort unload any LoRA weights that might be present
+                if hasattr(pipe, "unload_lora_weights"):
+                    pipe.unload_lora_weights()  # unload all
+            except Exception:
+                try: pipe.disable_lora()
+                except Exception: pass
+            self._active_style[pipe_name] = None
             return
 
+        # sanity check
         if adapter not in LORAS:
             raise ValueError(f"Unknown adapter '{adapter}'. Choose one of: {', '.join(list(LORAS.keys()) + ['none'])}")
 
-        repo = LORAS[adapter]
-        for p in (self.t2i, self.i2i, self.inpaint):
+        # only (re)load if switching styles
+        if self._active_style.get(pipe_name) != adapter:
+            # hard reset: ensure nothing residual remains
             try:
-                known = getattr(p, "_known_adapters", set())
-                if adapter not in known:
-                    p.load_lora_weights(repo, adapter_name=adapter, use_peft_backend=False)
-                    known.add(adapter)
-                    setattr(p, "_known_adapters", known)
-                # Do NOT fuse on inpaint; just set adapter weights
-                p.set_adapters(adapter, adapter_weights=[float(scale)])
+                if hasattr(pipe, "unload_lora_weights"):
+                    pipe.unload_lora_weights()
+            except Exception:
+                pass
+            try:
+                pipe.disable_lora()
             except Exception:
                 pass
 
-        self.active_adapter = adapter
+            # load requested style (diffusers backend = no PEFT stacking)
+            repo = LORAS[adapter]
+            pipe.load_lora_weights(repo, adapter_name=adapter, use_peft_backend=False)
+            self._active_style[pipe_name] = adapter
+
+        # activate only this adapter with a single weight
+        pipe.set_adapters([adapter], adapter_weights=[float(scale)])
+
+    def _set_adapter(self, adapter: str, scale: float = 1.0):
+        # keep all three pipelines in sync
+        self._set_adapter_single(self.t2i, "t2i", adapter, scale)
+        self._set_adapter_single(self.i2i, "i2i", adapter, scale)
+        self._set_adapter_single(self.inpaint, "inpaint", adapter, scale)
+        self.active_adapter = (adapter or "none").lower()
 
     # ─────────────── Text → Image ─────────────── #
     @modal.method()
@@ -244,26 +315,71 @@ class SDXLLoRAHost:
         seed=None,
         adapter: str = "none",
         negative_prompt: str | None = None,
+        adapter_scale: float | None = None,
+        use_freeu: bool = False,
     ) -> bytes:
         if not prompt:
             raise ValueError("Missing 'prompt'.")
-        self._set_adapter(adapter)
+
+        if adapter_scale is None:
+            adapter_scale = STYLE_HINTS.get(adapter, {}).get("default_scale", 1.0)
+        self._set_adapter(adapter, scale=float(adapter_scale))
+
+        # Shrink prompts, then apply short style hints
+        hint = STYLE_HINTS.get(adapter, {})
+        prompt = _shrink_prompt(prompt, max_words=70)
+        neg = _shrink_prompt(negative_prompt, max_words=70) if negative_prompt else None
+        if hint.get("add"):
+            prompt = f"{prompt} {hint['add']}".strip()
+        if neg:
+            negative_prompt = f"{neg} {hint.get('neg','')}".strip()
+        else:
+            negative_prompt = hint.get("neg", None)
+
+        # Snap sizes to 64-multiples (SDXL friendly)
+        width = _snap64(width)
+        height = _snap64(height)
+
+        # Ensure t2i uses Karras sigmas as well
+        try:
+            cfg = self.t2i.scheduler.config
+            if getattr(cfg, "use_karras_sigmas", False) is False:
+                cfg.use_karras_sigmas = True
+            from diffusers import DPMSolverMultistepScheduler
+            self.t2i.scheduler = DPMSolverMultistepScheduler.from_config(cfg)
+        except Exception:
+            pass
 
         g = None
         if seed is not None:
             g = torch.Generator(device=self.device).manual_seed(int(seed))
 
+        # Optional FreeU
+        freeu_enabled = False
+        if use_freeu and hasattr(self.t2i, "enable_freeu"):
+            try:
+                self.t2i.enable_freeu(s1=0.9, s2=0.2, b1=1.2, b2=1.4)
+                freeu_enabled = True
+            except Exception:
+                pass
+
         with torch.inference_mode():
             image = self.t2i(
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            width=int(width),
-            height=int(height),
-            num_inference_steps=int(steps),
-            guidance_scale=float(guidance_scale),
-            generator=g,
-            output_type="pil",
-        ).images[0]
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                width=int(width),
+                height=int(height),
+                num_inference_steps=int(steps),
+                guidance_scale=float(guidance_scale),
+                generator=g,
+                output_type="pil",
+            ).images[0]
+
+        if freeu_enabled and hasattr(self.t2i, "disable_freeu"):
+            try:
+                self.t2i.disable_freeu()
+            except Exception:
+                pass
         return _pil_to_png_bytes(image)
 
     # ─────────────── Image → Image ─────────────── #
@@ -296,11 +412,22 @@ class SDXLLoRAHost:
     
         # single adapter, adjustable scale
         self._set_adapter(adapter, scale=float(adapter_scale))
-    
+
+        # Shrink prompts, then apply short style hints
+        hint = STYLE_HINTS.get(adapter, {})
+        prompt = _shrink_prompt(prompt, max_words=70)
+        neg = _shrink_prompt(negative_prompt, max_words=70) if negative_prompt else None
+        if hint.get("add"):
+            prompt = f"{prompt} {hint['add']}".strip()
+        if neg:
+            negative_prompt = f"{neg} {hint.get('neg','')}".strip()
+        else:
+            negative_prompt = hint.get("neg", None)
+
         # --- preprocess init image safely ---
         init = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         if out_size:
-            size = int(out_size)
+            size = _snap64(int(out_size))
             if keep_aspect:
                 # center-crop to square, then resize → no distortion
                 init = ImageOps.fit(init, (size, size), method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
@@ -395,7 +522,7 @@ class SDXLLoRAHost:
         seed=None,
         out_size: int = 1024,
         adapter: str = "none",
-        adapter_scale: float = 0.9,
+        adapter_scale: float = 1.0,
         negative_prompt: str | None = None,
     ):
         """
@@ -407,7 +534,6 @@ class SDXLLoRAHost:
           - Output is forced to 'out_size' longest side to match story canvas.
         """
         import io
-        from PIL import Image, ImageOps
         import numpy as np
         import torch
     
@@ -425,24 +551,35 @@ class SDXLLoRAHost:
     
         # 2) Force deterministic canvas size (match your story template)
         if out_size and int(out_size) > 0:
-            out_size = int(out_size)
+            out_size = _snap64(int(out_size))
             w, h = bg.size
             scale = out_size / float(max(w, h))
             if scale != 1.0:
                 bg = bg.resize((max(1, int(round(w * scale))), max(1, int(round(h * scale)))), Image.Resampling.LANCZOS)
-    
+
         if mask.size != bg.size:
             mask = mask.resize(bg.size, Image.Resampling.LANCZOS)
-    
+
         # Binarize mask (sane contract: white=inpaint, black=keep)
         mask = mask.point(lambda p: 255 if p > 127 else 0)
-        # Light edge treatment to avoid halos at seams
-        mask = mask.filter(ImageFilter.MaxFilter(3))      # slight dilation
-        mask = mask.filter(ImageFilter.GaussianBlur(1.2)) # feather
-    
+        # Edge hygiene scaled to size
+        px = max(1, int(round(max(bg.size) / 1024 * 1.2)))
+        mask = mask.filter(ImageFilter.MaxFilter(2 * px + 1))
+        mask = mask.filter(ImageFilter.GaussianBlur(0.8 * px))
+
         # 3) Style (LoRA) — single call, no fuse/unfuse or unload/reload
         self._set_adapter(adapter, scale=float(adapter_scale))
-    
+        # Shrink prompts, then apply short style hints (lighter touch for inpaint)
+        hint = STYLE_HINTS.get(adapter, {})
+        prompt = _shrink_prompt(prompt, max_words=70)
+        neg = _shrink_prompt(negative_prompt, max_words=70) if negative_prompt else None
+        if hint.get("add"):
+            prompt = f"{prompt} {hint['add']}".strip()
+        if neg:
+            negative_prompt = f"{neg} {hint.get('neg','')}".strip()
+        else:
+            negative_prompt = hint.get("neg", None)
+
         # 4) Seed locking
         g = None
         if seed is not None:
@@ -453,7 +590,7 @@ class SDXLLoRAHost:
         # Negative prompt fallback to reduce common artifacts if none provided
         if negative_prompt is None:
             negative_prompt = (
-                "extra limbs, extra fingers, deformed face, asymmetry, "
+                "extra limbs, extra fingers, deformed face,"
                 "mustache, beard, text, watermark, low quality, blurry"
             )
 
@@ -499,6 +636,8 @@ def t2i(request: dict):
     seed = request.get("seed")
     seed = int(seed) if seed is not None else None
     adapter = request.get("adapter", "none")
+    adapter_scale = 1.0
+    use_freeu = bool(request.get("use_freeu", False))
 
     png = SDXLLoRAHost().generate_t2i.remote(
         prompt=prompt,
@@ -509,6 +648,8 @@ def t2i(request: dict):
         seed=seed,
         adapter=adapter,
         negative_prompt=negative_prompt,
+        adapter_scale=adapter_scale,
+        use_freeu=use_freeu,
     )
     return {"image": _png_bytes_to_b64(png)}
 
@@ -588,7 +729,7 @@ def inpaint(request: dict):
         seed=seed,
         out_size=int(request.get("out_size", 1024)),
         adapter = request.get("adapter", "none"),
-        adapter_scale=float(request.get("adapter_scale", 0.9)),
+        adapter_scale=float(request.get("adapter_scale", 1.0)),
         negative_prompt=request.get("negative_prompt"),
     )
     return {"image": _png_bytes_to_b64(png), "safety": safety}

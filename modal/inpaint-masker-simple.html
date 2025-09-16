@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Background + Inpaint Mask Creator</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--bg:#0b0f14;--panel:#121821;--text:#e9eef7;--muted:#9fb0c6;--accent:#6ea8fe;--line:#1f2937}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial}
+  header{padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+  h1{margin:0;font-size:16px}
+  .wrap{display:grid;grid-template-columns:300px 1fr;gap:12px;padding:12px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .row{display:flex;gap:8px;align-items:center;margin:8px 0;flex-wrap:wrap}
+  .mono, textarea, input[type=text], input[type=number]{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0c111a;border:1px solid #1e293b;border-radius:8px;color:#dbeafe;padding:8px}
+  textarea{width:100%}
+  label{color:var(--muted);font-size:12px}
+  button{background:#1d2837;border:1px solid #2c3b52;color:#e9eef7;border-radius:8px;padding:8px 10px;cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#081225}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .seg button{border-radius:8px}
+  .seg button+button{margin-left:6px}
+  .tip{color:var(--muted);font-size:12px}
+  canvas{background:#0a0f16;border:1px solid var(--line);border-radius:12px;max-width:100%;height:auto;touch-action:none}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+<header><h1>🖌️ Background + Inpaint Mask Creator (White = inpaint / Black = keep)</h1></header>
+
+<div class="wrap">
+  <!-- LEFT: controls -->
+  <div class="panel">
+    <div class="row seg" id="tabs">
+      <button data-tab="t2i" class="primary">Text → Image</button>
+      <button data-tab="inpaint">Mask & Upload</button>
+    </div>
+
+    <!-- T2I -->
+    <div id="panel-t2i" class="tab">
+      <div class="row"><label style="font-weight:600;color:#cbd5e1">Generate Background</label></div>
+      <div class="row">
+        <label>Endpoint</label>
+        <input id="t2iEndpoint" class="mono" style="width:100%" value="https://maxwellabgit--sdxl-lora-api-t2i.modal.run">
+      </div>
+      <div class="row grid">
+        <div>
+          <label>Style (LoRA key)</label>
+          <select id="t2iAdapter" class="mono" style="width:100%">
+            <option value="ghibli" selected>ghibli</option>
+            <option value="anime">anime</option>
+            <option value="90s_anime">90s_anime</option>
+            <option value="pixar">pixar</option>
+          </select>
+        </div>
+        <div>
+          <label>Out size (px)</label>
+          <input id="t2iSize" class="mono" type="number" value="1024">
+        </div>
+      </div>
+      <div class="row"><label>Prompt</label></div>
+      <textarea id="t2iPrompt" rows="3">storybook background, clean composition, no characters, soft light</textarea>
+      <div class="row"><label>Negative prompt</label></div>
+      <textarea id="t2iNegPrompt" rows="2"> watermark, messy edges, deformed face</textarea>
+      <div class="row grid">
+        <label>steps <input id="t2iSteps" class="mono" type="number" value="28" style="width:80px"></label>
+        <label>guidance <input id="t2iGuidance" class="mono" type="number" step="0.1" value="5.5" style="width:80px"></label>
+      </div>
+      <div class="row">
+        <button id="generateBtn" class="primary">Generate</button>
+        <input type="file" id="bgFile" accept="image/*" />
+        <button id="fitBtn">Fit to Canvas</button>
+      </div>
+      <p class="tip">Tip: you can also drag & drop an image onto the canvas.</p>
+    </div>
+
+    <!-- INPAINT / MASK -->
+    <div id="panel-inpaint" class="tab" style="display:none">
+      <div class="row"><label style="font-weight:600;color:#cbd5e1">Paint Mask</label></div>
+      <div class="row">
+        <button id="paintBtn" class="primary">Paint (white)</button>
+        <button id="eraseBtn">Erase (black)</button>
+        <label>Brush<input id="brushSize" class="mono" type="number" value="42" style="width:80px"></label>
+      </div>
+      <div class="row">
+        <button id="invertBtn">Invert</button>
+        <button id="clearBtn">Clear</button>
+        <label>Feather on export (px) <input id="feather" class="mono" type="number" value="14" style="width:80px"></label>
+      </div>
+
+      <div class="row">
+        <label>Load photo</label>
+        <input type="file" id="photoFile" accept="image/*" />
+      </div>
+
+      <hr style="border-color:#1f2937">
+
+      <div class="row"><label style="font-weight:600;color:#cbd5e1">Upload to Supabase</label></div>
+      <div class="row"><label>Supabase URL</label></div>
+      <input id="sbUrl" class="mono" value="https://sblomrejdmexbcikxvqw.supabase.co">
+      <div class="row"><label>Anon (publishable) key</label></div>
+      <input id="sbAnon" class="mono" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNibG9tcmVqZG1leGJjaWt4dnF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2NzMzMzIsImV4cCI6MjA3MDI0OTMzMn0.wZ6q8OlWiht1QIFLrp9-FOKeepshVEJ9iPK9SXV3jHI">
+      <div class="row grid">
+        <div>
+          <label>Bucket</label>
+          <input id="sbBucket" class="mono" value="imaginestudio-assets">
+        </div>
+        <div>
+          <label>Folder</label>
+          <input id="sbFolder" class="mono" value="backgrounds">
+        </div>
+      </div>
+      <div class="row">
+        <button id="uploadBtn" class="primary">Upload BG + MASK</button>
+      </div>
+      <p class="tip">We store two files: <code>..._bg.png</code> and <code>..._mask.png</code>.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: canvas -->
+  <div class="panel">
+    <canvas id="view" width="1024" height="1024"></canvas>
+    <div class="row"><span class="tip">Draw on the canvas — white areas will be regenerated.</span></div>
+  </div>
+</div>
+
+<script>
+/* ---------- Canvas + Mask (HiDPI safe) ---------- */
+const view = document.getElementById('view');
+const vtx  = view.getContext('2d', { willReadFrequently:true });
+const mask = document.createElement('canvas');
+const mtx  = mask.getContext('2d', { willReadFrequently:true });
+let bg = new Image();
+
+function setCanvasSize(w,h){
+  const dpr = window.devicePixelRatio || 1;
+  view.width = Math.max(1, Math.round(w*dpr));
+  view.height = Math.max(1, Math.round(h*dpr));
+  view.style.width = w + 'px';
+  view.style.height = h + 'px';
+  mask.width = view.width; mask.height = view.height;
+  mtx.fillStyle = '#000'; mtx.fillRect(0,0,mask.width,mask.height);
+}
+
+function fitToBg(){
+  const w = bg.naturalWidth || 1024, h = bg.naturalHeight || 1024;
+  setCanvasSize(w,h);
+  redraw();
+}
+
+function redraw(){
+  // draw bg
+  vtx.setTransform(1,0,0,1,0,0);
+  vtx.clearRect(0,0,view.width,view.height);
+  if (bg && bg.naturalWidth){
+    vtx.drawImage(bg, 0,0, view.width, view.height);
+  } else {
+    vtx.fillStyle = '#0a0f16'; vtx.fillRect(0,0,view.width,view.height);
+  }
+  // live red overlay from mask
+  const img = vtx.getImageData(0,0,view.width,view.height);
+  const m = mtx.getImageData(0,0,mask.width,mask.height);
+  const d = img.data, md = m.data;
+  for (let i=0;i<d.length;i+=4){
+    const white = md[i]; // red channel
+    if (white>8){ d[i]=255; d[i+1]=0; d[i+2]=0; d[i+3]=120; }
+  }
+  vtx.putImageData(img,0,0);
+}
+fitToBg();
+
+/* ---------- Painting ---------- */
+let tool = 'paint';
+let brush = 42;
+let isDown = false;
+
+function setTool(t){
+  tool = t;
+  document.getElementById('paintBtn').classList.toggle('primary', t==='paint');
+  document.getElementById('eraseBtn').classList.toggle('primary', t==='erase');
+}
+document.getElementById('paintBtn').onclick = ()=> setTool('paint');
+document.getElementById('eraseBtn').onclick = ()=> setTool('erase');
+document.getElementById('brushSize').oninput = e=> brush = Math.max(1, parseInt(e.target.value,10)||1);
+
+function pointerXY(e){
+  const rect = view.getBoundingClientRect();
+  const dpr  = window.devicePixelRatio || 1;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return {
+    x: (clientX - rect.left) * dpr * view.width / (rect.width * (window.devicePixelRatio||1)),
+    y: (clientY - rect.top ) * dpr * view.height/ (rect.height* (window.devicePixelRatio||1))
+  };
+}
+
+function drawDot(x,y){
+  mtx.globalCompositeOperation = (tool==='paint') ? 'source-over' : 'destination-out';
+  mtx.fillStyle = (tool==='paint') ? '#fff' : '#000';
+  mtx.beginPath(); mtx.arc(x,y, (brush*(window.devicePixelRatio||1))/2, 0, Math.PI*2); mtx.fill();
+  redraw();
+}
+
+view.addEventListener('mousedown', e=>{ isDown=true; const p=pointerXY(e); drawDot(p.x,p.y); });
+view.addEventListener('mousemove', e=>{ if(!isDown) return; const p=pointerXY(e); drawDot(p.x,p.y); });
+window.addEventListener('mouseup', ()=> isDown=false);
+view.addEventListener('touchstart', e=>{ isDown=true; const p=pointerXY(e); drawDot(p.x,p.y); e.preventDefault(); }, {passive:false});
+view.addEventListener('touchmove',  e=>{ if(!isDown) return; const p=pointerXY(e); drawDot(p.x,p.y); e.preventDefault(); }, {passive:false});
+view.addEventListener('touchend',   ()=> isDown=false);
+
+/* ---------- Mask ops ---------- */
+document.getElementById('invertBtn').onclick = ()=>{
+  const m = mtx.getImageData(0,0,mask.width,mask.height); const d = m.data;
+  for(let i=0;i<d.length;i+=4){ d[i]=255-d[i]; d[i+1]=255-d[i+1]; d[i+2]=255-d[i+2]; d[i+3]=255; }
+  mtx.putImageData(m,0,0); redraw();
+};
+document.getElementById('clearBtn').onclick = ()=>{
+  mtx.fillStyle='#000'; mtx.fillRect(0,0,mask.width,mask.height); redraw();
+};
+
+/* ---------- Background loading ---------- */
+const bgFile = document.getElementById('bgFile');
+bgFile.addEventListener('change', e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const url = URL.createObjectURL(f);
+  bg.onload = ()=>{ fitToBg(); URL.revokeObjectURL(url); };
+  bg.src = url;
+});
+const photoFile = document.getElementById('photoFile');
+if (photoFile){
+  photoFile.addEventListener('change', e=>{
+    const f = e.target.files[0]; if(!f) return;
+    const url = URL.createObjectURL(f);
+    bg.onload = ()=>{ fitToBg(); URL.revokeObjectURL(url); };
+    bg.src = url;
+  });
+}
+document.getElementById('fitBtn').onclick = fitToBg;
+view.addEventListener('dragover', e=> e.preventDefault());
+view.addEventListener('drop', e=>{
+  e.preventDefault(); const f = e.dataTransfer.files[0];
+  if (!f || !f.type.startsWith('image/')) return;
+  const url = URL.createObjectURL(f);
+  bg.onload = ()=>{ fitToBg(); URL.revokeObjectURL(url); };
+  bg.src = url;
+});
+
+/* ---------- Helpers ---------- */
+function dataUrlToBlob(dataUrl){
+  const [meta, b64] = dataUrl.split(',');
+  const mime = (meta.match(/data:(.*?);base64/)||[])[1] || 'application/octet-stream';
+  const bin = atob(b64); const len = bin.length; const bytes = new Uint8Array(len);
+  for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime });
+}
+function canvasToDataURLWithoutOverlay(){
+  const out = document.createElement('canvas'); out.width = view.width; out.height = view.height;
+  const ctx = out.getContext('2d');
+  if (bg && bg.naturalWidth) ctx.drawImage(bg,0,0,out.width,out.height);
+  return out.toDataURL('image/png');
+}
+function exportMaskDataURL(featherPx=14){
+  const out = document.createElement('canvas'); out.width = mask.width; out.height = mask.height;
+  const octx = out.getContext('2d');
+  if (featherPx>0){ octx.filter = `blur(${featherPx}px)`; }
+  octx.drawImage(mask,0,0);
+  // force grayscale L in RGB
+  const img = octx.getImageData(0,0,out.width,out.height);
+  const d = img.data; for (let i=0;i<d.length;i+=4){ d[i+1]=d[i]; d[i+2]=d[i]; d[i+3]=255; }
+  octx.putImageData(img,0,0);
+  return out.toDataURL('image/png');
+}
+
+/* ---------- T2I ---------- */
+function setBusy(on){ ['generateBtn','uploadBtn'].forEach(id=>{ const b=document.getElementById(id); if(b) b.disabled=on; }); }
+async function generateFromText(){
+  const endpoint = document.getElementById('t2iEndpoint').value.trim();
+  const adapter  = document.getElementById('t2iAdapter').value.trim();
+  const prompt   = document.getElementById('t2iPrompt').value;
+  const negative = document.getElementById('t2iNegPrompt').value;
+  const steps    = parseInt(document.getElementById('t2iSteps').value,10) || 28;
+  const guidance = parseFloat(document.getElementById('t2iGuidance').value) || 5.5;
+  const out_size = parseInt(document.getElementById('t2iSize').value,10) || 1024;
+  if (!endpoint){ alert('Provide t2i endpoint'); return; }
+  setBusy(true);
+  try{
+    const payload = { prompt, negative_prompt:negative, adapter, steps, guidance_scale:guidance, out_size };
+    const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const url = data.image || data.url;
+    await new Promise((resolve)=>{ bg.onload=()=>{ fitToBg(); resolve(); }; bg.crossOrigin='anonymous'; bg.src=url; });
+    showTab('inpaint'); // jump to mask tab after generation
+  } catch(e){ console.error(e); alert('t2i failed'); }
+  finally{ setBusy(false); }
+}
+document.getElementById('generateBtn').onclick = generateFromText;
+
+/* ---------- Supabase Upload ---------- */
+let supabaseClient=null;
+async function ensureSupabase(){
+  const url = document.getElementById('sbUrl').value.trim();
+  const key = document.getElementById('sbAnon').value.trim();
+  if (!url || !key) throw new Error('Supabase URL + anon key required');
+  if (!supabaseClient || supabaseClient.supabaseUrl !== url){
+    supabaseClient = window.supabase.createClient(url, key);
+  }
+  return supabaseClient;
+}
+
+async function uploadToSupabase(){
+  setBusy(true);
+  try{
+    const client = await ensureSupabase();
+    const bucket = document.getElementById('sbBucket').value.trim();
+    const folder = document.getElementById('sbFolder').value.trim() || 'backgrounds';
+
+    const adapter  = document.getElementById('t2iAdapter').value.trim() || 'generic';
+    const prompt   = document.getElementById('t2iPrompt').value;
+    const negative = document.getElementById('t2iNegPrompt').value;
+
+    const ts = new Date().toISOString().replace(/[:.]/g,'-');
+    const base = `${folder}/${adapter}/${ts}`;
+
+    // bg
+    const bgUrl  = canvasToDataURLWithoutOverlay();
+    const bgBlob = dataUrlToBlob(bgUrl);
+    const bgPath = `${base}_bg.png`;
+    const { error: bgErr } = await client.storage.from(bucket).upload(bgPath, bgBlob, { contentType:'image/png', upsert:true });
+    if (bgErr) throw bgErr;
+    const { data: bgPub } = client.storage.from(bucket).getPublicUrl(bgPath);
+
+    // mask (with feather)
+    const featherPx = Math.max(0, parseInt(document.getElementById('feather').value,10) || 0);
+    const maskUrl  = exportMaskDataURL(featherPx);
+    const maskBlob = dataUrlToBlob(maskUrl);
+    const maskPath = `${base}_mask.png`;
+    const { error: maskErr } = await client.storage.from(bucket).upload(maskPath, maskBlob, { contentType:'image/png', upsert:true });
+    if (maskErr) throw maskErr;
+    const { data: maskPub } = client.storage.from(bucket).getPublicUrl(maskPath);
+
+    // copy URLs for convenience
+    const out = { bg: bgPub.publicUrl, mask: maskPub.publicUrl };
+    await navigator.clipboard.writeText(JSON.stringify(out,null,2)).catch(()=>{});
+    alert('Uploaded. Public URLs copied to clipboard.');
+  } catch(e){ console.error(e); alert('Upload failed. Check console.'); }
+  finally{ setBusy(false); }
+}
+document.getElementById('uploadBtn').onclick = uploadToSupabase;
+
+/* ---------- Tabs ---------- */
+function showTab(tab){
+  document.querySelectorAll('.tab').forEach(p=> p.style.display='none');
+  document.getElementById(`panel-${tab}`).style.display='block';
+  document.querySelectorAll('#tabs button').forEach(b=> b.classList.remove('primary'));
+  const btn = document.querySelector(`#tabs button[data-tab="${tab}"]`);
+  if (btn) btn.classList.add('primary');
+}
+document.getElementById('tabs').addEventListener('click', (e)=>{
+  const b = e.target.closest('button[data-tab]'); if(!b) return;
+  showTab(b.getAttribute('data-tab'));
+});
+</script>
+</body>
+</html>
